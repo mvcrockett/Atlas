@@ -1,0 +1,86 @@
+name: NoPants 6A International Rig Tournament
+on:
+  push:
+    branches:
+      - no-pants-6a-international-engine-tournament
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  japanese-semantic-order-repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install CPU-only rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg python3-pil
+      - name: Rebuild the same original layered anime portrait and write PSD via ag-psd
+        run: |
+          /usr/bin/python3 benchmarks/international/4d_original_art.py "$RUNNER_TEMP/art4d"
+          mkdir -p "$RUNNER_TEMP/psd-builder"
+          cd "$RUNNER_TEMP/psd-builder"
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund ag-psd@30.2.0 pngjs@7 canvas@3.1.2
+          cp "$GITHUB_WORKSPACE/benchmarks/international/build4d_psd.cjs" ./build4d_psd.cjs
+          node ./build4d_psd.cjs "$RUNNER_TEMP/art4d" "$RUNNER_TEMP/fixture.psd"
+      - name: Get original Japanese MIT engine, inject test-only fixed-time driver
+        run: |
+          git clone --depth 1 https://github.com/852wa/Anime2.5DRig.git "$RUNNER_TEMP/anime25d"
+          cp "$RUNNER_TEMP/fixture.psd" "$RUNNER_TEMP/anime25d/sample2.psd"
+          /usr/bin/python3 benchmarks/international/patch4d_japanese.py "$RUNNER_TEMP/anime25d/lib/app.js"
+      - name: Install Playwright
+        run: |
+          cd benchmarks/international
+          npm install --no-save playwright@1.55.0 pngjs@7
+          npx playwright install --with-deps chromium
+      - name: Serve unmodified Japanese WebGL1 auto-rigger with test hook
+        run: |
+          cd "$RUNNER_TEMP/anime25d"
+          nohup /usr/bin/python3 -m http.server 8000 --bind 127.0.0.1 > "$RUNNER_TEMP/4d-japanese-server.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:8000/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo 'Japanese server did not start'
+          exit 1
+      - name: Deterministic 72 frames and original-art animation evidence
+        run: node benchmarks/international/capture4d.mjs japanese
+      - name: Upload original, redistributable output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-6a-japanese-depth-order-repair
+          path: |
+            output/4d-japanese/japanese.mp4
+            output/4d-japanese/japanese_montage.png
+            output/4d-japanese/metrics.json
+            output/4d-japanese/telemetry.json
+          if-no-files-found: warn
+
+  linux-compatibility-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check CPU graphics and distribution animation packages
+        run: |
+          echo '== Host =='
+          uname -a
+          echo '== Availability (no installations; source or package contracts only) =='
+          for pkg in synfigstudio synfig opentoonz libgl1 xvfb ffmpeg; do
+            echo "-- $pkg --"
+            apt-cache policy "$pkg" | head -n 8 || true
+          done
+          echo '== Existing system binaries =='
+          command -v ffmpeg || true
+          command -v synfig || true
+          command -v tcomposer || true
+          command -v xvfb-run || true
+          echo '== CPU GPU exposure =='
+          ls -l /dev/dri 2>/dev/null || echo 'No hardware /dev/dri; headless software GL only'
+      - name: Finish short compatibility check
+        run: echo 'Static Linux package screen only; NOT an Inochi/OpenToonz rendered test.'
