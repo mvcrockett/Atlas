@@ -1,4 +1,5 @@
 name: Render free animation
+# Phase 4.1 acceptance rerun: no animation source changes
 on:
   workflow_dispatch:
   push:
