@@ -1,0 +1,95 @@
+name: NoPants 4C CPU International Auto-Rigger Benchmark
+on:
+  push:
+    branches:
+      - no-pants-4c-cpu-international-rig-benchmark
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  anime25d:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Clone Japanese MIT auto-rig renderer
+        run: |
+          git clone --depth 1 https://github.com/852wa/Anime2.5DRig.git "$RUNNER_TEMP/Anime2.5DRig"
+          git -C "$RUNNER_TEMP/Anime2.5DRig" rev-parse HEAD
+          test "$(wc -c < "$RUNNER_TEMP/Anime2.5DRig/sample2.psd")" -gt 100000
+      - name: Install Chromium
+        run: |
+          cd benchmarks/international
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Serve unchanged Japanese browser rig locally
+        run: |
+          cd "$RUNNER_TEMP/Anime2.5DRig"
+          nohup python3 -m http.server 8000 --bind 127.0.0.1 > "$RUNNER_TEMP/japanese-rig.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:8000/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/japanese-rig.log"
+          exit 1
+      - name: Capture 72 frames of original Japanese engine
+        run: node benchmarks/international/capture4c_japanese.mjs
+      - name: Upload metrics only; no third-party artwork or video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants4c-japanese-metrics
+          path: output/4c-japanese/metrics.json
+          if-no-files-found: warn
+  stretchy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Clone pinned upstream Stretchy and identical public PSD
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/international/psd4c.html" ./psd4b.html
+          cp "$GITHUB_WORKSPACE/benchmarks/international/psd4c.js" ./psd4c.js
+          curl -fsSL --max-time 45 --output fixture.psd https://raw.githubusercontent.com/852wa/Anime2.5DRig/main/sample2.psd
+          test "$(wc -c < fixture.psd)" -gt 100000
+      - name: Install Chromium
+        run: |
+          cd benchmarks/international
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start Stretchy
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/psd4c-vite.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:5173/psd4b.html > /dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/psd4c-vite.log"
+          exit 1
+      - name: Capture 72 frames using native Stretchy rig on same PSD
+        run: node benchmarks/international/capture4c_stretchy.mjs
+      - name: Upload nonvisual metrics only; no art or video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants4c-stretchy-metrics
+          path: output/sprint4c-stretchy/metrics.json
+          if-no-files-found: warn
