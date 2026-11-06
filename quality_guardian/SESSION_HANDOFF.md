@@ -56,3 +56,12 @@ Atlas, continue No Pants Anime Software Mission 02. The new lavender heroine ref
 - Scoreboard: PNG GitHub missing; MP4 missing; generation attempts 0/2; side quests 0; spending $0; infrastructure preserved; generative video UNVERIFIED; artistic animated quality UNVERIFIED.
 - Required next action: user uploads the exact approved PNG to GitHub at assets/characters/lavender/approved_reference.png and/or attaches an actual free I2V MP4 from NiftyVid. Recheck only after new evidence. Do not endlessly rerun the same missing-file check.
 - Always end NPAS sessions with one-tap continuation prompt.
+
+## STRATEGIC PIVOT — 2026-11-06 (user authorized)
+User explicitly rejected the repeated missing-PNG GitHub-check / manual-upload / repeat-check loop and ordered a pivot. Retire Mission 02's missing-file polling as the critical path. Preserve all existing code and approved canonical heroine reference; do not erase history.
+
+NEW NEXT MISSION: Anime-first creative-engine proof of concept. Objective: obtain one actual professionally styled anime generative video shot, inspect frames for identity/anatomy/motion, THEN decide whether/how to automate it. Prioritize an accessible free image-to-video GPU path or user-approved alternate; do not make GitHub binary preservation a prerequisite to first artistic test. No paid services without explicit consent; no procedural cartoons, slideshow, local desktop, or speculative framework. Limit to two materially distinct execution attempts per blocker. Existing reference sheet may need portrait crop for video conditioning, but no new artwork canonized without approval.
+
+Evidence status at pivot: approved still reference exists in conversation/local environment, no MP4, no remote I2V execution, $0 spend, existing infrastructure unchanged. A website advertising free GPU is not proof of runnable access. If no callable remote free GPU is accessible, present a concrete choice for user rather than repeat the old loop.
+
+Next prompt: Atlas, execute the anime-first creative-engine proof of concept under the NPAS pivot. Find an actually executable free remote generative-video path that can use our approved heroine, without requiring GitHub binary upload as a prerequisite. Run and inspect one short genuine anime clip if supported, max two distinct attempts and $0 paid services. If no execution path exists, stop and give me the smallest concrete choice needed to unlock it. Preserve code, update handoff only with new evidence, and end with one-tap continuation.
