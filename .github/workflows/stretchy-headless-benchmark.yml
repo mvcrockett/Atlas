@@ -1,0 +1,90 @@
+name: NoPants Stretchy Headless Benchmark
+on:
+  push:
+    branches:
+      - no-pants-sprint2-stretchy-headless
+  workflow_dispatch:
+
+jobs:
+  stretchy-headless:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout NoPants benchmark branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Clone pinned Stretchy Studio upstream
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          cp "$GITHUB_WORKSPACE/benchmarks/stretchy-headless/benchmark.html" ./benchmark.html
+          cp "$GITHUB_WORKSPACE/benchmarks/stretchy-headless/benchmark.js" ./benchmark.js
+
+      - name: Install Stretchy Studio dependencies
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          pnpm install --frozen-lockfile
+
+      - name: Install headless capture dependency
+        run: |
+          cd benchmarks/stretchy-headless
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Start Stretchy Studio Vite server
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/stretchy-vite.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/stretchy-vite.pid"
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173/benchmark.html >/dev/null; then
+              echo "Stretchy benchmark server ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/stretchy-vite.log"
+          exit 1
+
+      - name: Render 48 articulated frames with Stretchy
+        run: |
+          node benchmarks/stretchy-headless/capture.mjs http://127.0.0.1:5173/benchmark.html output/stretchy-headless
+
+      - name: Preserve representative visual evidence
+        run: |
+          mkdir -p output/stretchy-headless/representative
+          cp output/stretchy-headless/frames/frame_0000.png output/stretchy-headless/representative/
+          cp output/stretchy-headless/frames/frame_0012.png output/stretchy-headless/representative/
+          cp output/stretchy-headless/frames/frame_0024.png output/stretchy-headless/representative/
+          cp output/stretchy-headless/frames/frame_0036.png output/stretchy-headless/representative/
+          cp output/stretchy-headless/frames/frame_0047.png output/stretchy-headless/representative/
+
+      - name: Show benchmark metrics
+        if: always()
+        run: |
+          test -f output/stretchy-headless/metrics.json && cat output/stretchy-headless/metrics.json || true
+          echo "--- Vite log ---"
+          cat "$RUNNER_TEMP/stretchy-vite.log" || true
+
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nopants-stretchy-headless-evidence
+          path: |
+            output/stretchy-headless/stretchy-headless.mp4
+            output/stretchy-headless/metrics.json
+            output/stretchy-headless/telemetry.json
+            output/stretchy-headless/representative/*.png
+          if-no-files-found: warn
