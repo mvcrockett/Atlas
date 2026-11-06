@@ -31,3 +31,10 @@ The Phase 4 workflow also renders the original fish and every Phase 2–3 exampl
 
 ## Phase 4.1 — GIF timing and caption polish
 Phase 4's GIF export now distributes 10-millisecond GIF delay quantization across frames instead of rounding every frame to the same delay. For the default 12 fps, 72 frames total exactly 6.00 seconds. Scene crossfades now blend **caption-free scene frames** and render only the incoming shot's caption afterward, avoiding overlapping dialogue. The Phase 1–3 engines are unchanged. GIF players may still vary in their interpretation of frame delays. Phase 5 audio remains future work.
+
+## Phase 5 — offline audio MVP (WAV to synchronized MP4)
+`audio.py` takes an existing silent MP4 and one or more **user-provided, uncompressed PCM WAV** recordings, with per-track start time in seconds and volume, and creates a separate iPhone-friendly H.264/AAC MP4. It never alters the original MP4 or silent GIF. Edit `audio.json` with your own local WAV file paths; **only use music/sound effects you created or have rights to use**. Tracks beyond the video duration are trimmed; gaps are silent. No voice cloning, TTS, paid APIs, or music downloads are part of this MVP.
+
+Usage after rendering Phase 4: `python audio.py --config audio.json`. For CI only, `python audio.py --make-demo-tone assets/audio/demo_tone.wav` creates an original, short 440 Hz test beep, **not a voice performance**. Replace it with a recording to hear real speech. GitHub Actions runs the synthetic test and uploads the audio MP4 alongside the preserved 12 silent exports. FFmpeg is provided by the open-source `imageio-ffmpeg` wheel in the workflow. This is the first step toward the preserved roadmap of user voices, licensed SFX/music, optional vetted open-source TTS, and more advanced timeline mixing.
+
+**Playback note:** The existing Phase 4.1 MP4 was validated as H.264 and converted to a compatible baseline variant; whether the ChatGPT iOS app opens a particular sandbox link still depends on the client. GitHub Actions artifacts provide a second download route.
