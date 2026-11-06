@@ -3,7 +3,7 @@ name: NoPants 4D Original-Anime Matched 24fps Benchmark
 on:
   push:
     branches:
-      - no-pants-4d-original-art-matched-benchmark
+      - no-pants-4d-public-domain-research
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/psd-builder"
           cd "$RUNNER_TEMP/psd-builder"
           npm init -y > /dev/null
-          npm install --no-audit --no-fund ag-psd@30.2.0 pngjs@7
+          npm install --no-audit --no-fund ag-psd@30.2.0 pngjs@7 canvas@3.1.2
           cp "$GITHUB_WORKSPACE/benchmarks/international/build4d_psd.cjs" ./build4d_psd.cjs
           node ./build4d_psd.cjs "$RUNNER_TEMP/art4d" "$RUNNER_TEMP/fixture.psd"
       - name: Get original Japanese MIT engine, inject test-only fixed-time driver
@@ -86,7 +86,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/psd-builder"
           cd "$RUNNER_TEMP/psd-builder"
           npm init -y > /dev/null
-          npm install --no-audit --no-fund ag-psd@30.2.0 pngjs@7
+          npm install --no-audit --no-fund ag-psd@30.2.0 pngjs@7 canvas@3.1.2
           cp "$GITHUB_WORKSPACE/benchmarks/international/build4d_psd.cjs" ./build4d_psd.cjs
           node ./build4d_psd.cjs "$RUNNER_TEMP/art4d" "$RUNNER_TEMP/fixture.psd"
       - name: Clone exact pinned Stretchy native WebGL2 engine
