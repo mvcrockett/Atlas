@@ -21,6 +21,7 @@ on:
       - visual_quality.py
       - motion_sprint1.py
       - motion_sprint2.py
+      - motion_sprint21.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -78,6 +79,8 @@ jobs:
         run: pip install 'mediapipe==0.10.21'
       - name: Track licensed real human gesture and retarget to original character
         run: python motion_sprint2.py
+      - name: Test anatomically constrained retargeting against Sprint 2 baseline
+        run: python motion_sprint21.py
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
@@ -92,5 +95,7 @@ jobs:
             output/motion_sprint1/motion.json
             output/motion_sprint1/reference.mkv
             output/motion_sprint2/pose.json
+            output/motion_sprint21/metrics.json
+            output/motion_sprint21/before_after.png
             output/fish.gif
             output/fish.mp4
