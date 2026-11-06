@@ -2,6 +2,14 @@ name: Phone-First Continuous Anime Engine
 on:
   workflow_dispatch:
     inputs:
+      seconds:
+        description: "Duration in seconds (5 or 10)"
+        required: true
+        default: '10'
+        type: choice
+        options:
+          - '5'
+          - '10'
       interpolation:
         description: "CPU method"
         required: true
@@ -10,10 +18,6 @@ on:
         options:
           - flow
           - blend
-  push:
-    paths:
-      - continuous_engine/**
-      - .github/workflows/continuous-anime.yml
 jobs:
   interpolate:
     runs-on: ubuntu-latest
@@ -25,8 +29,8 @@ jobs:
           python-version: '3.11'
       - name: Install free CPU interpolation dependencies
         run: pip install numpy pillow opencv-python-headless imageio imageio-ffmpeg
-      - name: Render every frame of five-second movie
-        run: python continuous_engine/render.py --method ${{ inputs.interpolation || 'flow' }}
+      - name: Render bounded CPU animation
+        run: python continuous_engine/render.py --method ${{ inputs.interpolation || 'flow' }} --seconds ${{ inputs.seconds || '10' }}
       - name: Check movie frame count and metrics
         run: |
           python - <<'PY'
@@ -34,14 +38,22 @@ jobs:
           from pathlib import Path
           p=Path('output/continuous_engine')
           m=json.loads((p/'metrics.json').read_text())
-          assert m['frame_count']==120 and len(list((p/'frames').glob('frame_*.png')))==120
+          import imageio.v2 as imageio
+          expected=int('${{ inputs.seconds || '10' }}')*24
+          assert m['frame_count']==expected and len(list((p/'frames').glob('frame_*.png')))==expected
+          assert m['fps']==24 and m['seconds']==expected/24
           assert (p/'continuous.mp4').stat().st_size>10000
-          print('PASS: 120 frames, 24 fps, MP4/GIF exist. Optical flow quality remains unverified.')
+          reader=imageio.get_reader(str(p/'continuous.mp4'),format='ffmpeg')
+          meta=reader.get_meta_data(); assert abs(meta['duration']-expected/24)<0.1,meta
+          assert reader.count_frames()==expected
+          reader.close()
+          assert m['mean_frame_difference']>0.01, 'No measurable motion'
+          print('PASS: frame count, 24 fps, duration, MP4 and measurable motion; artistic quality UNVERIFIED.')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: continuous-anime-cpu-120frames
+          name: continuous-anime-cpu-bounded
           path: |
             output/continuous_engine/continuous.mp4
             output/continuous_engine/continuous.gif
@@ -50,4 +62,4 @@ jobs:
             output/continuous_engine/frames/frame_0030.png
             output/continuous_engine/frames/frame_0060.png
             output/continuous_engine/frames/frame_0090.png
-            output/continuous_engine/frames/frame_0119.png
+            output/continuous_engine/frames/frame_0239.png
