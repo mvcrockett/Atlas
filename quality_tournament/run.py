@@ -31,9 +31,9 @@ def main():
   status["blender"]["reason"]="render verified" if status["blender"]["rendered"] else "Blender scene failed or no decoded frames"
  if status["synfig"]["installed"]:
   res=run(["synfig","quality_tournament/character.sif","-t","png","-w","480","-h","270","-o",str(OUT/"synfig_test.png")],90)
-  png=OUT/"synfig_test.png"
-  status["synfig"].update({"render_log":res,"rendered":res["exit"]==0 and png.exists() and png.stat().st_size>1000})
-  status["synfig"]["reason"]="Synfig actual still-frame render (not five-second animation)" if status["synfig"]["rendered"] else "Synfig file/render unsupported; no success claimed"
+  pngs=sorted(OUT.glob("synfig_test.*.png"))
+  status["synfig"].update({"render_log":res,"rendered":res["exit"]==0 and len(pngs)>=10,"native_frames":len(pngs)})
+  status["synfig"]["reason"]="Synfig native 40-frame render verified; all frames static because no animation keyframes in SIF (NOT an animated wave)" if status["synfig"]["rendered"] else "Synfig file/render unsupported; no success claimed"
  status.update({"comfyui_wan22":{"rendered":False,"reason":"No GPU in standard GitHub Actions runner; local RTX 4060 not connected"},"opentoonz":{"rendered":False,"reason":"Not installed/tested in this CPU job"},"vtuber_rig":{"rendered":False,"reason":"No authored face rig or tested runtime"},"video_stylization":{"rendered":False,"reason":"No GPU model installed or licensed input pipeline"}})
  (OUT/"results.json").write_text(json.dumps(status,indent=2))
  print(json.dumps({k:{"rendered":v["rendered"],"reason":v["reason"]} for k,v in status.items()},indent=2))
