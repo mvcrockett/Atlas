@@ -15,6 +15,8 @@ on:
       - audio.json
       - showcase.json
       - anime_layers.py
+      - rig2.py
+      - rig2.json
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -58,6 +60,8 @@ jobs:
         run: python phase4.py --config showcase.json
       - name: Render original layered anime-inspired parallax showcase
         run: python anime_layers.py
+      - name: Render layered Character Rig 2.0 performance
+        run: python rig2.py --config rig2.json
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
