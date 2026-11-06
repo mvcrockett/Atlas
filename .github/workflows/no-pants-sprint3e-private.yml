@@ -18,7 +18,7 @@ jobs:
       NOPANTS_ART_BUNDLE_URL: ${{ secrets.NOPANTS_ART_BUNDLE_URL }}
       NOPANTS_ART_BUNDLE_SHA256: ${{ secrets.NOPANTS_ART_BUNDLE_SHA256 }}
       NOPANTS_EVIDENCE_KEY_HEX: ${{ secrets.NOPANTS_EVIDENCE_KEY_HEX }}
-      NOPANTS_ASSET_DIR: ${{ runner.temp }}/nopants-private-art
+      NOPANTS_ASSET_DIR: /tmp/nopants-private-art
     steps:
       - uses: actions/checkout@v4
       - name: Fail closed when secure asset ingress is not configured
