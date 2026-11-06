@@ -1,5 +1,10 @@
 name: NoPants Sprint 3E PRIVATE Real-Art Stretchy Render
 on:
+  push:
+    branches:
+      - no-pants-sprint3e-private-art-ingress
+    paths:
+      - .github/workflows/no-pants-sprint3e-private.yml
   workflow_dispatch:
 
 permissions:
