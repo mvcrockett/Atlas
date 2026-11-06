@@ -1,0 +1,75 @@
+name: NoPants Sprint 3A Art-to-Rig Bridge
+on:
+  push:
+    branches:
+      - no-pants-sprint3a-art-to-rig-bridge
+  workflow_dispatch:
+jobs:
+  bridge-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install rendering dependencies including missing FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg python3-pil
+          ffmpeg -version | head -1
+      - name: Clone pinned Stretchy renderer and install
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge.html" ./bridge.html
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge.js" ./bridge.js
+      - name: Generate non-anime calibration texture fixtures ONLY
+        run: |
+          mkdir -p "$RUNNER_TEMP/stretchystudio/art"
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import json, os
+          p=Path(os.environ['RUNNER_TEMP'])/'stretchystudio'/'art'
+          for name,color,y0,y1 in [('torso',(110,70,165,255),220,455),('head',(208,152,165,255),25,258)]:
+              im=Image.new('RGBA',(280,470),(0,0,0,0))
+              d=ImageDraw.Draw(im)
+              d.rounded_rectangle((75,y0,205,y1),radius=24,fill=color,outline=(35,25,48,255),width=4)
+              d.line((85,y0+18,195,y1-18),fill=(247,220,250,255),width=3)
+              im.save(p/(name+'.png'))
+          manifest={'canvas':{'width':280,'height':470},'status':'CALIBRATION_ONLY_NOT_ANIME','approval':False,'layers':[{'id':'torso','path':'torso.png','parent':'root','order':0,'pivot':[140,310]},{'id':'head','path':'head.png','parent':'root','order':1,'pivot':[140,140]}],'controls':{'head_y':{'node':'head'},'breathing':{'node':'torso'}}}
+          (p/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - name: Install Playwright with headless browser
+        run: |
+          cd benchmarks/art-to-rig
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start pinned Stretchy Vite server
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/bridge-vite.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:5173/bridge.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/bridge-vite.log"
+          exit 1
+      - name: Render and verify 48 frames through real Stretchy components
+        run: node benchmarks/art-to-rig/capture.mjs http://127.0.0.1:5173/bridge.html output/art-to-rig
+      - name: Upload technical evidence; NOT anime-quality approval
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nopants-sprint3a-technical-calibration
+          path: |
+            output/art-to-rig/art-to-rig.mp4
+            output/art-to-rig/metrics.json
+            output/art-to-rig/inspect_*.png
+          if-no-files-found: warn
