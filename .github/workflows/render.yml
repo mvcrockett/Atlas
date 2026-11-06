@@ -23,7 +23,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Verify runner FFmpeg without apt network install
+        run: |
+          command -v ffmpeg
+          ffmpeg -version
       - run: pip install -r requirements.txt
       - name: Preserve Phase 1 fish
         run: python animate.py
