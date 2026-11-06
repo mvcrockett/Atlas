@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<canvas version="1.0" width="480" height="270" xres="2834.645669" yres="2834.645669" view-box="-4.000000 2.250000 4.000000 -2.250000" antialias="2" fps="24.000" begin-time="0f" end-time="2s" bgcolor="0.96 0.94 0.97 1.0">
+  <name>NoPants Synfig Fallback Benchmark</name>
+
+  <layer type="SolidColor" active="true" version="0.1" desc="Background">
+    <param name="amount"><real value="1.0000000000"/></param>
+    <param name="blend_method"><integer value="0"/></param>
+    <param name="color"><color><r>0.956</r><g>0.941</g><b>0.969</b><a>1.0</a></color></param>
+  </layer>
+
+  <layer type="group" active="true" version="0.2" desc="BodyBreathing">
+    <param name="amount"><real value="1.0"/></param>
+    <param name="blend_method"><integer value="0"/></param>
+    <param name="origin"><vector><x>0</x><y>-0.6</y></vector></param>
+    <param name="transformation">
+      <composite type="transformation">
+        <offset><vector><x>0</x><y>0</y></vector></offset>
+        <angle><angle value="0"/></angle>
+        <skew_angle><angle value="0"/></skew_angle>
+        <scale>
+          <animated type="vector">
+            <waypoint time="0f"><vector><x>1</x><y>1</y></vector></waypoint>
+            <waypoint time="24f"><vector><x>1</x><y>1.035</y></vector></waypoint>
+            <waypoint time="48f"><vector><x>1</x><y>1</y></vector></waypoint>
+          </animated>
+        </scale>
+      </composite>
+    </param>
+    <param name="canvas">
+      <canvas>
+        <layer type="rectangle" active="true" version="0.2" desc="LavenderBody">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="color"><color><r>0.557</r><g>0.420</g><b>0.722</b><a>1</a></color></param>
+          <param name="point1"><vector><x>-0.75</x><y>0.10</y></vector></param>
+          <param name="point2"><vector><x>0.75</x><y>-1.55</y></vector></param>
+        </layer>
+
+        <layer type="rectangle" active="true" version="0.2" desc="UpperArm">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="color"><color><r>0.937</r><g>0.769</g><b>0.682</b><a>1</a></color></param>
+          <param name="point1"><vector><x>0.58</x><y>-0.05</y></vector></param>
+          <param name="point2"><vector><x>1.25</x><y>-0.30</y></vector></param>
+        </layer>
+
+        <layer type="group" active="true" version="0.2" desc="LowerArmElbowRig">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="origin"><vector><x>0</x><y>0</y></vector></param>
+          <param name="transformation">
+            <composite type="transformation">
+              <offset><vector><x>1.25</x><y>-0.175</y></vector></offset>
+              <angle>
+                <animated type="angle">
+                  <waypoint time="0f"><angle value="0"/></waypoint>
+                  <waypoint time="24f"><angle value="-62"/></waypoint>
+                  <waypoint time="48f"><angle value="0"/></waypoint>
+                </animated>
+              </angle>
+              <skew_angle><angle value="0"/></skew_angle>
+              <scale><vector><x>1</x><y>1</y></vector></scale>
+            </composite>
+          </param>
+          <param name="canvas">
+            <canvas>
+              <layer type="rectangle" active="true" version="0.2" desc="LowerArm">
+                <param name="amount"><real value="1"/></param>
+                <param name="blend_method"><integer value="0"/></param>
+                <param name="color"><color><r>0.937</r><g>0.769</g><b>0.682</b><a>1</a></color></param>
+                <param name="point1"><vector><x>0</x><y>0.12</y></vector></param>
+                <param name="point2"><vector><x>0.82</x><y>-0.12</y></vector></param>
+              </layer>
+              <layer type="circle" active="true" version="0.1" desc="Hand">
+                <param name="amount"><real value="1"/></param>
+                <param name="blend_method"><integer value="0"/></param>
+                <param name="color"><color><r>0.937</r><g>0.769</g><b>0.682</b><a>1</a></color></param>
+                <param name="radius"><real value="0.16"/></param>
+                <param name="origin"><vector><x>0.88</x><y>0</y></vector></param>
+              </layer>
+            </canvas>
+          </param>
+        </layer>
+      </canvas>
+    </param>
+  </layer>
+
+  <layer type="group" active="true" version="0.2" desc="HeadBob">
+    <param name="amount"><real value="1"/></param>
+    <param name="blend_method"><integer value="0"/></param>
+    <param name="origin"><vector><x>0</x><y>0</y></vector></param>
+    <param name="transformation">
+      <composite type="transformation">
+        <offset>
+          <animated type="vector">
+            <waypoint time="0f"><vector><x>0</x><y>0</y></vector></waypoint>
+            <waypoint time="24f"><vector><x>0</x><y>0.09</y></vector></waypoint>
+            <waypoint time="48f"><vector><x>0</x><y>0</y></vector></waypoint>
+          </animated>
+        </offset>
+        <angle><angle value="0"/></angle>
+        <skew_angle><angle value="0"/></skew_angle>
+        <scale><vector><x>1</x><y>1</y></vector></scale>
+      </composite>
+    </param>
+    <param name="canvas">
+      <canvas>
+        <layer type="circle" active="true" version="0.1" desc="Hair">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="color"><color><r>0.290</r><g>0.180</g><b>0.333</b><a>1</a></color></param>
+          <param name="radius"><real value="0.76"/></param>
+          <param name="origin"><vector><x>0</x><y>0.93</y></vector></param>
+        </layer>
+        <layer type="circle" active="true" version="0.1" desc="Face">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="color"><color><r>0.937</r><g>0.769</g><b>0.682</b><a>1</a></color></param>
+          <param name="radius"><real value="0.62"/></param>
+          <param name="origin"><vector><x>0</x><y>0.80</y></vector></param>
+        </layer>
+
+        <layer type="group" active="true" version="0.2" desc="BlinkL">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="origin"><vector><x>-0.22</x><y>0.86</y></vector></param>
+          <param name="transformation">
+            <composite type="transformation">
+              <offset><vector><x>0</x><y>0</y></vector></offset>
+              <angle><angle value="0"/></angle>
+              <skew_angle><angle value="0"/></skew_angle>
+              <scale>
+                <animated type="vector">
+                  <waypoint time="0f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="10f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="12f"><vector><x>1</x><y>0.10</y></vector></waypoint>
+                  <waypoint time="15f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="48f"><vector><x>1</x><y>1</y></vector></waypoint>
+                </animated>
+              </scale>
+            </composite>
+          </param>
+          <param name="canvas">
+            <canvas>
+              <layer type="circle" active="true" version="0.1"><param name="amount"><real value="1"/></param><param name="blend_method"><integer value="0"/></param><param name="color"><color><r>0.16</r><g>0.31</g><b>0.27</b><a>1</a></color></param><param name="radius"><real value="0.10"/></param><param name="origin"><vector><x>-0.22</x><y>0.86</y></vector></param></layer>
+            </canvas>
+          </param>
+        </layer>
+
+        <layer type="group" active="true" version="0.2" desc="BlinkR">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="origin"><vector><x>0.22</x><y>0.86</y></vector></param>
+          <param name="transformation">
+            <composite type="transformation">
+              <offset><vector><x>0</x><y>0</y></vector></offset>
+              <angle><angle value="0"/></angle>
+              <skew_angle><angle value="0"/></skew_angle>
+              <scale>
+                <animated type="vector">
+                  <waypoint time="0f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="10f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="12f"><vector><x>1</x><y>0.10</y></vector></waypoint>
+                  <waypoint time="15f"><vector><x>1</x><y>1</y></vector></waypoint>
+                  <waypoint time="48f"><vector><x>1</x><y>1</y></vector></waypoint>
+                </animated>
+              </scale>
+            </composite>
+          </param>
+          <param name="canvas">
+            <canvas>
+              <layer type="circle" active="true" version="0.1"><param name="amount"><real value="1"/></param><param name="blend_method"><integer value="0"/></param><param name="color"><color><r>0.16</r><g>0.31</g><b>0.27</b><a>1</a></color></param><param name="radius"><real value="0.10"/></param><param name="origin"><vector><x>0.22</x><y>0.86</y></vector></param></layer>
+            </canvas>
+          </param>
+        </layer>
+
+        <layer type="group" active="true" version="0.2" desc="Smile">
+          <param name="amount"><real value="1"/></param>
+          <param name="blend_method"><integer value="0"/></param>
+          <param name="origin"><vector><x>0</x><y>0.56</y></vector></param>
+          <param name="transformation">
+            <composite type="transformation">
+              <offset><vector><x>0</x><y>0</y></vector></offset>
+              <angle><angle value="0"/></angle>
+              <skew_angle><angle value="0"/></skew_angle>
+              <scale>
+                <animated type="vector">
+                  <waypoint time="0f"><vector><x>0.70</x><y>1</y></vector></waypoint>
+                  <waypoint time="22f"><vector><x>1.35</x><y>1</y></vector></waypoint>
+                  <waypoint time="48f"><vector><x>0.85</x><y>1</y></vector></waypoint>
+                </animated>
+              </scale>
+            </composite>
+          </param>
+          <param name="canvas">
+            <canvas>
+              <layer type="rectangle" active="true" version="0.2" desc="Mouth">
+                <param name="amount"><real value="1"/></param>
+                <param name="blend_method"><integer value="0"/></param>
+                <param name="color"><color><r>0.62</r><g>0.31</g><b>0.40</b><a>1</a></color></param>
+                <param name="point1"><vector><x>-0.18</x><y>0.59</y></vector></param>
+                <param name="point2"><vector><x>0.18</x><y>0.53</y></vector></param>
+              </layer>
+            </canvas>
+          </param>
+        </layer>
+      </canvas>
+    </param>
+  </layer>
+</canvas>
