@@ -1,0 +1,55 @@
+name: NoPants 7B Rhubarb CPU Cue Proof (Public Synthetic Audio)
+on:
+  push:
+    branches: [no-pants-sprint7b-canonical-art-lipsync]
+    paths: [.github/workflows/no-pants-sprint7b-rhubarb.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cues:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bounded CPU tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends espeak ffmpeg unzip
+      - name: Create original nonprivate synthetic dialogue
+        run: |
+          mkdir -p output/nopants7b
+          echo "Hello there. Our anime studio is finally moving." > output/nopants7b/dialogue.txt
+          espeak -v en-us -s 175 -p 53 -a 160 -w output/nopants7b/dialogue.wav -f output/nopants7b/dialogue.txt
+      - name: Download pinned official Rhubarb Linux binary
+        run: |
+          curl --fail --location --retry 2 --max-time 150 -o /tmp/rhubarb.zip https://github.com/DanielSWolf/rhubarb-lip-sync/releases/download/v1.14.0/Rhubarb-Lip-Sync-1.14.0-Linux.zip
+          unzip -q /tmp/rhubarb.zip -d /tmp/rhubarb-unpacked
+          RHUBARB="$(find /tmp/rhubarb-unpacked -type f -name rhubarb | head -1)"
+          test -n "$RHUBARB"
+          chmod +x "$RHUBARB"
+          echo "RHUBARB=$RHUBARB" >> "$GITHUB_ENV"
+          "$RHUBARB" --version
+      - name: Generate actual recognized lip synchronization cues
+        run: |
+          "$RHUBARB" --recognizer pocketSphinx --exportFormat json --dialogFile output/nopants7b/dialogue.txt --output output/nopants7b/rhubarb_cues.json output/nopants7b/dialogue.wav
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('output/nopants7b/rhubarb_cues.json')
+          j=json.loads(p.read_text())
+          cues=j.get('mouthCues',[])
+          assert len(cues)>=2, f'Not enough mouth cues: {len(cues)}'
+          assert all(k in c for c in cues for k in ('start','end','value'))
+          assert any(c['value']!='X' for c in cues)
+          print(f'Rhubarb produced {len(cues)} real timing cues; audio is nonprivate.')
+          PY
+      - name: Upload public synthetic cue evidence (no heroine artwork)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants7b-rhubarb-cpu-cues
+          path: |
+            output/nopants7b/rhubarb_cues.json
+            output/nopants7b/dialogue.wav
+            output/nopants7b/dialogue.txt
+          retention-days: 7
