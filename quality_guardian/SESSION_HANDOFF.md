@@ -186,3 +186,12 @@ MISSION: find actual free hosted execution path for anime-specialized I2V, prese
 - Circuit breaker: STOP; do not keep trying web mirrors, badges, third-party proxies or previous methods. No new verified code defect, so do not rewrite workflow or adapter. No manual website instructions to owner.
 - No new files/code, no paid service, no TinyFish automation, no GPU job, no anime MP4, no verified Actions execution. Source code and preflight workflow preserved unchanged. Handoff-only update for audit.
 - Re-entry condition: genuinely new connected tool that can list push/workflow_dispatch GitHub Actions runs or a trusted run-status artifact supplied by an accessible integration. Otherwise remain blocked and report accurately.
+
+
+## NPAS v2.0 — Capability-only inspection; no new execution route (2026-11-06)
+- Resumed from 13a561ac2576fc613edab353aff01f8b5fe7f8d1. Owner requested a genuinely new connected tool for GitHub Actions push/workflow_dispatch run inspection, without repeating exhausted GitHub API or status-badge methods.
+- Inspected currently exposed connected tools: GitHub offers fetch_commit_workflow_runs (PR-only), known-run job/log/artifact fetches, and rerun operations, but NO general list-workflow-runs or dispatch-workflow action. No other connected tool offers direct free GitHub Actions execution inspection. TinyFish paid browser automation excluded by owner.
+- GitHub's documented general REST endpoint exists (GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs), but existence of the endpoint is not an available execution capability; prior direct access attempts remain exhausted. Did not retry them.
+- STOP at circuit breaker. No code changes, no new workflow, no GPU job, no video generation, no verified Actions run. Do not present existing preflight as operational anime button.
+- Architectural recommendation: keep GitHub as source-of-truth for code and handoffs, but decouple generation from Actions until a reachable, observable, no-cost image-to-video service or new connected Actions run-listing capability exists. Require programmatic image upload, job ID/status and downloadable MP4, verified with a real run before claiming one-button production. Avoid rebuilding functioning CPU finishing code.
+- Paid spend $0. This entry is handoff-only; prior implementation files unchanged.
