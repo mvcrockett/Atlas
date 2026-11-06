@@ -7,7 +7,7 @@ const {writePsdBuffer,readPsd}=require('ag-psd');
 const src=process.argv[2]||'art4d';
 const dest=process.argv[3]||'fixture.psd';
 const names=['back hair','neck','topwear','face','eyewhite','irides','eyelash','eyebrow','mouth_close','mouth_open','eye_close','front hair'];
-const visibleSet=new Set(['back hair','neck','topwear','face','eyewhite','irides','eyelash','eyebrow','mouth_close','front hair']);
+const visibleSet=new Set(names); // Keep eye/mouth alternatives available to Japanese parser; renderers determine active expression.
 const images=names.map(name=>{
  const png=PNG.sync.read(fs.readFileSync(path.join(src,name+'.png')));
  if(png.width!==768||png.height!==768)throw Error('Unexpected PNG dimensions: '+name);
