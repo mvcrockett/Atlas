@@ -1,0 +1,52 @@
+{
+  "characters": {
+    "darcy": {
+      "color": "lavender",
+      "hair": "brown",
+      "x": 0.46
+    },
+    "pippin": {
+      "color": "coral",
+      "hair": "gold",
+      "x": 0.55
+    }
+  },
+  "stories": [
+    {
+      "name": "phase4_story",
+      "fps": 12,
+      "size": [
+        640,
+        360
+      ],
+      "shots": [
+        {
+          "duration": 2,
+          "character": "darcy",
+          "background": "garden",
+          "pose": "wave",
+          "expression": "happy",
+          "caption": "Welcome to our new animation studio, where stories can finally move!"
+        },
+        {
+          "duration": 2,
+          "character": "pippin",
+          "background": "studio",
+          "pose": "jump",
+          "expression": "surprised",
+          "transition": "fade",
+          "caption": "Wait, we can change poses, expressions, and even wrap longer captions?"
+        },
+        {
+          "duration": 2,
+          "character": "darcy",
+          "background": "night",
+          "pose": "walk",
+          "expression": "sad",
+          "transition": "fade",
+          "caption": "Yes. And the pants budget remains exactly zero."
+        }
+      ]
+    }
+  ]
+}
