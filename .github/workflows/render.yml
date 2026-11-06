@@ -18,6 +18,7 @@ on:
       - rig2.py
       - rig2.json
       - rig21.py
+      - visual_quality.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -67,6 +68,8 @@ jobs:
         run: python rig21.py --make-demo
       - name: Render imported Character Rig 2.1
         run: python rig21.py --manifest assets/rig21/manifest.json
+      - name: Compare original PNG art refinements with baseline Rig 2.1
+        run: python visual_quality.py
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
@@ -77,5 +80,6 @@ jobs:
           path: |
             output/**/*.gif
             output/**/*.mp4
+            output/visual_quality/before_after.png
             output/fish.gif
             output/fish.mp4
