@@ -1,0 +1,27 @@
+name: Render free animation
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - animate.py
+      - requirements.txt
+      - .github/workflows/render.yml
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install -r requirements.txt
+      - run: python animate.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: no-pants-fish-animation
+          path: |
+            output/fish.gif
+            output/fish.mp4
