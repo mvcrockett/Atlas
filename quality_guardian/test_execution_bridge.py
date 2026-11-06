@@ -90,7 +90,7 @@ class BridgeTests(unittest.TestCase):
         with self.assertRaisesRegex(BridgeError, "Input image"):
             ExecutionBridge(FakeTransport(), Policy(max_input_bytes=2)).run(b"abc", "a.png", payload, "x.mp4")
         with self.assertRaisesRegex(BridgeError, "Invalid, oversized"):
-            self.run_fake(FakeTransport(), Policy(max_output_bytes=12))
+            self.run_fake(FakeTransport(), Policy(max_output_bytes=16))
 
     def test_host_allowlist(self):
         with self.assertRaisesRegex(BridgeError, "allowlisted"):
