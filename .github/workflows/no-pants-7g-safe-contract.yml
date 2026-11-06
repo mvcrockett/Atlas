@@ -1,0 +1,23 @@
+name: NoPants 7G Safe Private Bridge Contract Tests
+on:
+  push:
+    branches: [no-pants-sprint7g-secure-heroine-bridge]
+    paths:
+      - tools/nopants7g/**
+      - .github/workflows/no-pants-7g-safe-contract.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safe-transport-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU-only synthetic test dependencies
+        run: python -m pip install --quiet Pillow cryptography
+      - name: Test without credentials or private assets
+        run: python tools/nopants7g/test_private_bridge.py
