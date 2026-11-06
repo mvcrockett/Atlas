@@ -1,0 +1,70 @@
+name: NoPants 6A Additional CPU and Headless Engine Probes
+on:
+  push:
+    branches:
+      - no-pants-6a-international-engine-tournament
+    paths:
+      - .github/workflows/no-pants-6a-extra-probes.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inochi-prebuilt-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download small official Inochi Creator Linux release, no artwork
+        run: |
+          curl -fL --retry 1 --max-time 120 --output /tmp/inochi-linux.zip https://github.com/Inochi2D/inochi-creator/releases/download/v0.8.6/inochi-creator-linux.zip
+          test "$(wc -c </tmp/inochi-linux.zip)" -gt 1000000
+          mkdir -p /tmp/inochi
+          unzip -q /tmp/inochi-linux.zip -d /tmp/inochi
+          find /tmp/inochi -maxdepth 3 -type f | head -n 30
+      - name: Discover native app and test software-GL startup under Xvfb
+        run: |
+          set +e
+          BIN="$(find /tmp/inochi -type f -name 'inochi-creator' | head -1)"
+          test -n "$BIN" || { echo 'No matching Inochi Creator executable in official archive'; exit 1; }
+          chmod +x "$BIN"
+          echo "Executable: $BIN"
+          echo 'Dependencies:'
+          ldd "$BIN" | grep -E 'not found|libGL|libSDL|libX11' | head -n 30
+          echo 'Software renderer smoke (20 sec bound):'
+          timeout 20s xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 MESA_GL_VERSION_OVERRIDE=3.3 "$BIN" --help > /tmp/inochi-smoke.log 2>&1
+          CODE=$?
+          tail -n 35 /tmp/inochi-smoke.log
+          echo "inochi_exit_code=$CODE" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$CODE" -eq 127 ] || [ "$CODE" -eq 126 ]; then exit 1; fi
+          echo 'A GUI app may legitimately time out here: process launch does not certify native animation.'
+          exit 0
+  synfig-cpu-render-readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Install Ubuntu-packaged Synfig CPU renderer only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y synfig ffmpeg
+      - name: Check actual CLI invocation and encoder availability
+        run: |
+          set +e
+          timeout 15s synfig --help > /tmp/synfig-help.log 2>&1
+          RESULT=$?
+          echo "synfig_help_exit=$RESULT" >> "$GITHUB_STEP_SUMMARY"
+          head -n 40 /tmp/synfig-help.log
+          command -v synfig
+          command -v ffmpeg
+          echo 'CLI execution verified; genuine layered anime Synfig rendering not implied.'
+          exit 0
+  opentoonz-packaging-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Assess official CPU Linux package availability without big downloads
+        run: |
+          set +e
+          apt-cache policy opentoonz
+          apt-cache show opentoonz | head -n 18
+          command -v tcomposer || true
+          echo 'No installation or rendering claim; there is no verified Linux distribution package in this runner.'
