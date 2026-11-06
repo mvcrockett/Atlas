@@ -70,14 +70,14 @@ def caption(im,message):
     for j,line in enumerate(lines):
         width=d.textbbox((0,0),line,font=f)[2]
         d.text(((w-width)/2,top+8+j*26),line,font=f,fill=(36,32,55))
-def frame(w,h,shot,profile,t):
+def frame(w,h,shot,profile,t,show_caption=True):
     bg=shot["background"];assert bg in SCENERY
     pose=shot.get("pose","idle");expression=shot.get("expression","happy")
     assert pose in ("idle","wave","jump","walk")
     assert expression in ("happy","surprised","sad","sleepy","neutral")
     im=backdrop(w,h,bg)
     draw_actor(im,profile,pose,expression,t)
-    caption(im,shot.get("caption",""))
+    if show_caption:caption(im,shot.get("caption",""))
     return im
 def render(story,profiles,root=Path("output")):
     name=story["name"];assert name and all(c.isalnum() or c in "_-" for c in name)
@@ -92,7 +92,7 @@ def render(story,profiles,root=Path("output")):
         profile=profiles[shot["character"]]
         assert profile["color"] in PALETTES and profile.get("hair","dark") in ("dark","brown","gold")
         count=round(float(shot["duration"])*fps);assert fps//2<=count<=fps*10
-        sequence=[frame(w,h,shot,profile,i/max(1,count-1)) for i in range(count)]
+        sequence=[frame(w,h,shot,profile,i/max(1,count-1),show_caption=False) for i in range(count)]
         # Crossfade the first few frames of each new shot into the previous shot.
         if all_frames and shot.get("transition","cut")=="fade":
             fade=min(6,len(sequence),len(all_frames))
@@ -100,9 +100,13 @@ def render(story,profiles,root=Path("output")):
             for i in range(fade):
                 alpha=ease((i+1)/fade)
                 sequence[i]=Image.blend(prior,sequence[i],alpha)
+        for im in sequence:caption(im,shot.get("caption",""))
         all_frames.extend(sequence)
     for i,im in enumerate(all_frames):im.save(frames/f"frame_{i:04d}.png")
-    all_frames[0].save(folder/(name+".gif"),save_all=True,append_images=all_frames[1:],duration=round(1000/fps),loop=0,optimize=True)
+    # GIF delay is quantized to 10 ms. Distribute rounding error across frames.
+    delays=[round((i+1)*100/fps)-round(i*100/fps) for i in range(len(all_frames))]
+    delays=[10*d for d in delays]
+    all_frames[0].save(folder/(name+".gif"),save_all=True,append_images=all_frames[1:],duration=delays,loop=0,optimize=False,disposal=2)
     if not shutil.which("ffmpeg"):raise RuntimeError("FFmpeg required")
     subprocess.run(["ffmpeg","-y","-loglevel","error","-framerate",str(fps),"-i",str(frames/"frame_%04d.png"),"-c:v","libx264","-pix_fmt","yuv420p",str(folder/(name+".mp4"))],check=True)
     print("Phase4:",name,"shots",len(shots),"frames",len(all_frames))
