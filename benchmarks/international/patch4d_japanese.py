@@ -38,6 +38,16 @@ window.__nopants4dStep=(frame)=>{
 window.__nopants4dReady=true;
 // END NoPants test-only frame stepper
 """
+# We preserve the upstream rigger and rendering pipeline. The incoming PSD
+# layers are topmost-first. The original engine renders in that order, so the
+# back-hair texture is drawn over the face despite its back-hair depth=0.55.
+# Reorder the original rig's parts by its own semantic depth before upload.
+# This is a fixture-specific compatibility test, not yet an upstream patch.
+anchor2="const prepared=prepareLayers(rig);"
+if code.count(anchor2)!=1:
+    raise SystemExit("Unexpected upstream applyRig contract")
+code=code.replace(anchor2,
+  "rig.layers.sort((a,b)=>(a.depth-b.depth)||(a.z-b.z));\\n  "+anchor2,1)
 code=code[:pos]+injection+'\n'+code[pos:]
 p.write_text(code)
 print('Deterministic Anime2.5DRig test hook installed (no replacement of upstream engine)')
