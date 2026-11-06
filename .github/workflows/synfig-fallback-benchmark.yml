@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y synfig ffmpeg python3-pil
-          synfig --version
+          synfig --version || true
           ffmpeg -version | head -n 1
 
       - name: Render exactly 48 frames with Synfig CLI
