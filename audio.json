@@ -1,0 +1,11 @@
+{
+  "video": "output/phase4_story/phase4_story.mp4",
+  "output": "output/phase5_story/phase5_story_with_audio.mp4",
+  "tracks": [
+    {
+      "path": "assets/audio/demo_tone.wav",
+      "start": 1,
+      "volume": 0.25
+    }
+  ]
+}
