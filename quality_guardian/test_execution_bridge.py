@@ -7,7 +7,8 @@ try:
 except ImportError:
     from execution_bridge import ExecutionBridge, BridgeError, Policy
 
-MP4 = (b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00"\n       b"\x00\x00\x00\x08moov")
+MP4 = (b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00"
+       b"\x00\x00\x00\x08moov")
 
 class FakeTransport:
     is_mock = True
