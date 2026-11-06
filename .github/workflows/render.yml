@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - animate.py
+      - studio.py
+      - scenes.json
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -18,10 +20,15 @@ jobs:
           python-version: '3.11'
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements.txt
-      - run: python animate.py
+      - name: Preserve legacy fish render
+        run: python animate.py
+      - name: Render configured scenes
+        run: python studio.py --config scenes.json
       - uses: actions/upload-artifact@v4
         with:
-          name: no-pants-fish-animation
+          name: no-pants-studio-animations
           path: |
+            output/**/*.gif
+            output/**/*.mp4
             output/fish.gif
             output/fish.mp4
