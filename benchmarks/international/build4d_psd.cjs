@@ -3,6 +3,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const {PNG}=require('pngjs');
+require('ag-psd/initialize-canvas'); // upstream native Node canvas initialization
 const {writePsdBuffer,readPsd}=require('ag-psd');
 const src=process.argv[2]||'art4d';
 const dest=process.argv[3]||'fixture.psd';
