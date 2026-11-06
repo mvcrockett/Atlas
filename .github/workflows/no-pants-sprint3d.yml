@@ -1,0 +1,90 @@
+name: NoPants Sprint 3D Stretchy Re-Sync
+on:
+  push:
+    branches:
+      - no-pants-sprint3d-stretchy-resync
+  workflow_dispatch:
+
+jobs:
+  stretchyrig:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install FFmpeg and calibration tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg python3-pil
+      - name: Install pinned upstream Stretchy without modifying existing NoPants engines
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge3d.html" ./bridge3d.html
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge3d.js" ./bridge3d.js
+      - name: Generate isolated calibration-only face, eyes and expression textures
+        run: |
+          mkdir -p "$RUNNER_TEMP/stretchystudio/art"
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          import os,json
+          p=Path(os.environ['RUNNER_TEMP'])/'stretchystudio'/'art'
+          def layer(name, painter):
+              im=Image.new('RGBA',(280,470),(0,0,0,0))
+              d=ImageDraw.Draw(im)
+              painter(d)
+              im.save(p/f'{name}.png')
+          layer('torso',lambda d:d.rounded_rectangle((35,215,245,468),radius=65,fill=(122,76,155,255),outline=(65,32,76,255),width=3))
+          layer('face',lambda d:d.ellipse((77,35,205,212),fill=(241,191,167,255),outline=(73,40,55,255),width=3))
+          layer('hair',lambda d:d.arc((54,12,226,234),180,359,fill=(68,38,69,255),width=33))
+          layer('eyes',lambda d:(d.ellipse((95,117,118,129),fill=(32,96,67,255)),d.ellipse((166,117,189,129),fill=(32,96,67,255))))
+          layer('closed',lambda d:(d.arc((90,113,123,134),5,175,fill=(70,40,51,255),width=3),d.arc((160,113,195,134),5,175,fill=(70,40,51,255),width=3)))
+          layer('mouth_neutral',lambda d:d.line((131,164,149,164),fill=(135,51,65,255),width=3))
+          layer('mouth_smile',lambda d:d.arc((124,158,158,178),10,170,fill=(135,51,65,255),width=4))
+          layer('mouth_open',lambda d:d.ellipse((132,158,147,177),fill=(96,30,57,255)))
+          layers=[('torso','torsoG'),('face','headG'),('hair','headG'),('eyes','headG'),('closed','headG'),('mouth_neutral','headG'),('mouth_smile','headG'),('mouth_open','headG')]
+          manifest={'canvas':{'width':280,'height':470},'status':'CALIBRATION_ONLY_NOT_ANIME','approval':False,
+            'groups':[{'id':'torsoG','parent':'root','pivot':[140,320]},{'id':'headG','parent':'root','pivot':[140,140]}],
+            'layers':[{'id':n,'path':n+'.png','parent':parent,'order':i,'pivot':[140,140],
+                       'opacity':0 if n in ('closed','mouth_smile','mouth_open') else 1} for i,(n,parent) in enumerate(layers)],
+            'controls':{'head_y':{'node':'headG'},'breathing':{'node':'torsoG'},'hair_drift':{'node':'hair'},
+                        'blink':{'eyes':['eyes'],'closed_lids':['closed']},
+                        'mouth_swap':{'neutral':'mouth_neutral','smile':'mouth_smile','open':'mouth_open'}}}
+          (p/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - name: Set up headless Chromium
+        run: |
+          cd benchmarks/art-to-rig
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start Stretchy Vite
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/sprint3d-vite.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:5173/bridge3d.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/sprint3d-vite.log"
+          exit 1
+      - name: Render native Stretchy 72-frame 24fps clip
+        run: node benchmarks/art-to-rig/capture3d.mjs
+      - name: Upload evidence; calibration is NOT the approved heroine
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-sprint3d-native-stretchy-calibration
+          path: |
+            output/sprint3d/sprint3d.mp4
+            output/sprint3d/metrics.json
+            output/sprint3d/telemetry.json
+            output/sprint3d/inspect_*.png
+          if-no-files-found: warn
