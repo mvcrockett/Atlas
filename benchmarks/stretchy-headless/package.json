@@ -1,0 +1,8 @@
+{
+  "name": "nopants-stretchy-headless-benchmark",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
