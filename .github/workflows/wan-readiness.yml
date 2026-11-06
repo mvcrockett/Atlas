@@ -1,0 +1,20 @@
+name: Wan Quality Sprint 3 Readiness
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - quality_tournament/launch_wan_windows.ps1
+      - quality_tournament/START_WAN_WINDOWS.cmd
+      - quality_tournament/wan_benchmark.json
+      - quality_tournament/validate_sprint3.py
+      - .github/workflows/wan-readiness.yml
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate Windows launcher and benchmark manifest without GPU
+        run: python quality_tournament/validate_sprint3.py
