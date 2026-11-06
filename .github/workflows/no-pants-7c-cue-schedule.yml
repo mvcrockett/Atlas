@@ -1,0 +1,21 @@
+name: NoPants 7C Safe Audio Cue Scheduling Tests
+on:
+  push:
+    branches: [no-pants-sprint7c-living-heroine]
+    paths:
+      - tools/nopants7c/**
+      - .github/workflows/no-pants-7c-cue-schedule.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-schedule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify synthetic Rhubarb cue scheduling without private artwork
+        run: python tools/nopants7c/test_schedule.py
