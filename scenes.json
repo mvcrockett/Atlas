@@ -1,0 +1,28 @@
+{
+  "scenes": [
+    {
+      "name": "fish_ocean",
+      "character": "fish",
+      "background": "ocean",
+      "motion": "swim",
+      "duration": 4,
+      "fps": 12
+    },
+    {
+      "name": "ball_sky",
+      "character": "ball",
+      "background": "sky",
+      "motion": "bounce",
+      "duration": 3,
+      "fps": 12
+    },
+    {
+      "name": "star_night",
+      "character": "star",
+      "background": "night",
+      "motion": "orbit",
+      "duration": 3,
+      "fps": 12
+    }
+  ]
+}
