@@ -1,0 +1,44 @@
+{
+  "stories": [
+    {
+      "name": "hello_lavender",
+      "fps": 12,
+      "size": [
+        640,
+        360
+      ],
+      "shots": [
+        {
+          "duration": 2,
+          "background": "garden",
+          "actor": {
+            "color": "lavender",
+            "pose": "wave",
+            "expression": "happy"
+          },
+          "caption": "Hello from the No Pants Studio!"
+        },
+        {
+          "duration": 2,
+          "background": "studio",
+          "actor": {
+            "color": "coral",
+            "pose": "jump",
+            "expression": "surprised"
+          },
+          "caption": "Wait... we can animate now?!"
+        },
+        {
+          "duration": 2,
+          "background": "stage",
+          "actor": {
+            "color": "mint",
+            "pose": "idle",
+            "expression": "sleepy"
+          },
+          "caption": "And all without paid services."
+        }
+      ]
+    }
+  ]
+}
