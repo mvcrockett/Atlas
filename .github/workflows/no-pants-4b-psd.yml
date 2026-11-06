@@ -1,0 +1,58 @@
+name: NoPants 4B Native PSD and Stretchy Compatibility
+on:
+  push:
+    branches:
+      - no-pants-4b-native-psd-probe
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-sample-private-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Fetch authentic third-party PSD and pinned upstream Stretchy
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/international/psd4b.html" ./psd4b.html
+          cp "$GITHUB_WORKSPACE/benchmarks/international/psd4b.js" ./psd4b.js
+          curl --fail --location --silent --show-error --max-time 45 --output fixture.psd https://raw.githubusercontent.com/852wa/Anime2.5DRig/main/sample2.psd
+          test "$(wc -c < fixture.psd)" -gt 100000
+          printf 'Verified PSD header: '
+          head -c 4 fixture.psd | od -An -tc
+      - name: Install Chromium
+        run: |
+          cd benchmarks/international
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start Stretchy
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/psd4b-vite.log" 2>&1 &
+          for i in {1..70}; do
+            curl -fsS http://127.0.0.1:5173/psd4b.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/psd4b-vite.log"
+          exit 1
+      - name: Parse actual PSD and render 48 frames using pinned Stretchy
+        run: node benchmarks/international/capture4b.mjs
+      - name: Upload nonvisual metrics only (no sample PSD or video)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-sprint4b-psd-parser-metrics-only
+          path: output/sprint4b/metrics.json
+          if-no-files-found: warn
