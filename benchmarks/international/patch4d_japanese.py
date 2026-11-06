@@ -47,7 +47,8 @@ anchor2="const prepared=prepareLayers(rig);"
 if code.count(anchor2)!=1:
     raise SystemExit("Unexpected upstream applyRig contract")
 code=code.replace(anchor2,
-  "rig.layers.sort((a,b)=>(a.depth-b.depth)||(a.z-b.z));\\n  "+anchor2,1)
+  "rig.layers.sort((a,b)=>(a.depth-b.depth)||(a.z-b.z));" + chr(10) + "  " + anchor2,1)
+pos=code.rfind(anchor)
 code=code[:pos]+injection+'\n'+code[pos:]
 p.write_text(code)
 print('Deterministic Anime2.5DRig test hook installed (no replacement of upstream engine)')
