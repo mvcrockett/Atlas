@@ -7,7 +7,7 @@ try:
 except ImportError:
     from execution_bridge import ExecutionBridge, BridgeError, Policy
 
-MP4 = b"\x00\x00\x00\x18ftypisom\x00\x00\x00\x00isom"
+MP4 = (b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00"\n       b"\x00\x00\x00\x08moov")
 
 class FakeTransport:
     is_mock = True
@@ -47,6 +47,8 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(result["paid_usd"], 0)
         self.assertTrue(result["mock"])
         self.assertEqual(result["job_id"], "mock-job-123")
+        self.assertEqual([entry["event"] for entry in result["audit"]],
+                         ["started", "uploaded", "submitted", "polled", "saved"])
 
     def test_retry_then_success(self):
         fake = FakeTransport(failures=1)
@@ -89,6 +91,31 @@ class BridgeTests(unittest.TestCase):
             ExecutionBridge(FakeTransport(), Policy(max_input_bytes=2)).run(b"abc", "a.png", payload, "x.mp4")
         with self.assertRaisesRegex(BridgeError, "Invalid, oversized"):
             self.run_fake(FakeTransport(), Policy(max_output_bytes=12))
+
+    def test_host_allowlist(self):
+        with self.assertRaisesRegex(BridgeError, "allowlisted"):
+            self.run_fake(FakeTransport(states=[{"state": "complete", "url": "https://evil.example/movie.mp4"}]))
+        with self.assertRaisesRegex(BridgeError, "allowlisted"):
+            self.run_fake(FakeTransport(states=[{"state": "complete", "url": "https://example.org:444/movie.mp4"}]))
+
+    def test_ip_literal_rejected(self):
+        with self.assertRaisesRegex(BridgeError, "IP literals"):
+            self.run_fake(FakeTransport(states=[{"state": "complete", "url": "https://127.0.0.1/movie.mp4"}]))
+
+    def test_mp4_missing_moov(self):
+        with self.assertRaisesRegex(BridgeError, "moov"):
+            self.run_fake(FakeTransport(video=MP4[:16]))
+
+    def test_mp4_corrupt_box(self):
+        with self.assertRaisesRegex(BridgeError, "box size"):
+            self.run_fake(FakeTransport(video=b"\\xff\\xff\\xff\\xffftyp" + MP4[8:]))
+
+    def test_audit_does_not_leak_url_or_image(self):
+        result = self.run_fake()
+        serialized = str(result["audit"])
+        self.assertNotIn("example.org", serialized)
+        self.assertNotIn("fake-image", serialized)
+        self.assertTrue(all(entry["paid_usd"] == 0.0 for entry in result["audit"]))
 
     def test_deadline(self):
         ticks = iter([0, 2])
