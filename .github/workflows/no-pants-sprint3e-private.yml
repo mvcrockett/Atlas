@@ -1,0 +1,87 @@
+name: NoPants Sprint 3E PRIVATE Real-Art Stretchy Render
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-anime-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NOPANTS_ART_BUNDLE_URL: ${{ secrets.NOPANTS_ART_BUNDLE_URL }}
+      NOPANTS_ART_BUNDLE_SHA256: ${{ secrets.NOPANTS_ART_BUNDLE_SHA256 }}
+      NOPANTS_EVIDENCE_KEY_HEX: ${{ secrets.NOPANTS_EVIDENCE_KEY_HEX }}
+      NOPANTS_ASSET_DIR: ${{ runner.temp }}/nopants-private-art
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail closed when secure asset ingress is not configured
+        run: |
+          python3 - <<'PY'
+          import os
+          missing=[n for n in ('NOPANTS_ART_BUNDLE_URL','NOPANTS_ART_BUNDLE_SHA256','NOPANTS_EVIDENCE_KEY_HEX') if not os.environ.get(n)]
+          if missing:
+              raise SystemExit('Secure art ingress NOT configured. No art downloaded or rendered. Configure the three GitHub Actions repository secrets in Settings.')
+          print('Private asset ingress configured. Secret values remain hidden.')
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install CPU dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg python3-pil python3-cryptography
+      - name: Download and validate unapproved fixture privately
+        run: |
+          umask 077
+          /usr/bin/python3 benchmarks/art-to-rig/sprint3e_secure_ingress.py
+      - name: Clone pinned Stretchy renderer, without touching legacy code
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge3d.html" ./bridge3d.html
+          cp "$GITHUB_WORKSPACE/benchmarks/art-to-rig/bridge3d.js" ./bridge3d.js
+          mkdir -p ./art
+          cp -a "$NOPANTS_ASSET_DIR/." ./art/
+      - name: Install headless browser
+        run: |
+          cd benchmarks/art-to-rig
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start Stretchy headless rendering server
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/s3e-vite.log" 2>&1 &
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:5173/bridge3d.html >/dev/null && exit 0
+            sleep 1
+          done
+          echo 'Stretchy server failed to start. Log omitted because private artwork is mounted.'
+          exit 1
+      - name: Generate exact 72-frame 24fps native Stretchy render
+        run: |
+          umask 077
+          node benchmarks/art-to-rig/capture3d.mjs > "$RUNNER_TEMP/s3e-private-capture.log" 2>&1 || {
+            echo 'Native Stretchy render failed. Private capture log intentionally not published.'
+            exit 1
+          }
+          echo 'Native Stretchy capture and MP4 assembly finished.'
+      - name: Inspect metrics and encrypt private outputs
+        run: |
+          umask 077
+          /usr/bin/python3 benchmarks/art-to-rig/sprint3e_seal_evidence.py
+      - name: Upload ciphertext only; NO raw artwork/frames/video
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-sprint3e-encrypted-evidence
+          path: |
+            output/sprint3e/private_evidence.aesgcm
+            output/sprint3e/STATUS.txt
+          if-no-files-found: error
+          retention-days: 7
