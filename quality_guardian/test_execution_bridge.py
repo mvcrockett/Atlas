@@ -105,7 +105,7 @@ class BridgeTests(unittest.TestCase):
 
     def test_mp4_missing_moov(self):
         with self.assertRaisesRegex(BridgeError, "moov"):
-            self.run_fake(FakeTransport(video=MP4[:16]))
+            self.run_fake(FakeTransport(video=MP4[:16] + b"\x00\x00\x00\x08free"))
 
     def test_mp4_corrupt_box(self):
         with self.assertRaisesRegex(BridgeError, "box size"):
