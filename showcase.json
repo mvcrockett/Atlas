@@ -1,0 +1,52 @@
+{
+  "characters": {
+    "nova": {
+      "color": "lavender",
+      "hair": "dark",
+      "x": 0.47
+    },
+    "sol": {
+      "color": "coral",
+      "hair": "gold",
+      "x": 0.55
+    }
+  },
+  "stories": [
+    {
+      "name": "anime_ambition_demo",
+      "fps": 24,
+      "size": [
+        640,
+        360
+      ],
+      "shots": [
+        {
+          "duration": 2,
+          "character": "nova",
+          "background": "night",
+          "pose": "idle",
+          "expression": "surprised",
+          "caption": "A signal from beyond the stars..."
+        },
+        {
+          "duration": 2,
+          "character": "sol",
+          "background": "garden",
+          "pose": "jump",
+          "expression": "happy",
+          "transition": "fade",
+          "caption": "Our story is only beginning!"
+        },
+        {
+          "duration": 2,
+          "character": "nova",
+          "background": "studio",
+          "pose": "wave",
+          "expression": "happy",
+          "transition": "fade",
+          "caption": "Next: illustrated layers, camera moves, and anime art!"
+        }
+      ]
+    }
+  ]
+}
