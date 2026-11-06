@@ -1,0 +1,47 @@
+{
+  "format_version": 1,
+  "name": "rig2_performance",
+  "title": "NO PANTS / CHARACTER RIG 2.0",
+  "fps": 12,
+  "seconds": 5,
+  "palette": {
+    "hair": [
+      70,
+      46,
+      116
+    ],
+    "hair_highlight": [
+      103,
+      68,
+      156
+    ],
+    "skin": [
+      252,
+      200,
+      181
+    ],
+    "jacket": [
+      39,
+      42,
+      92
+    ],
+    "iris": [
+      106,
+      66,
+      177
+    ]
+  },
+  "future_assets": {
+    "format": "transparent PNG RGBA",
+    "planned_layers": [
+      "back_hair",
+      "torso",
+      "head",
+      "eyes",
+      "eyebrows",
+      "mouth",
+      "front_hair"
+    ],
+    "status": "schema placeholder; external PNG import not yet implemented"
+  }
+}
