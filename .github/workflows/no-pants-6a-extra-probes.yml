@@ -21,6 +21,10 @@ jobs:
           mkdir -p /tmp/inochi
           unzip -q /tmp/inochi-linux.zip -d /tmp/inochi
           find /tmp/inochi -maxdepth 3 -type f | head -n 30
+      - name: Install missing SDL2 runtime for software-rendered GUI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libsdl2-2.0-0
       - name: Discover native app and test software-GL startup under Xvfb
         run: |
           set +e
