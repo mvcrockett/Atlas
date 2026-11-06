@@ -34,7 +34,7 @@ jobs:
       - name: Install Stretchy Studio dependencies
         run: |
           cd "$RUNNER_TEMP/stretchystudio"
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
 
       - name: Install headless capture dependency
         run: |
