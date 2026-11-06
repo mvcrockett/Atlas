@@ -40,7 +40,7 @@ def mux(config):
         raise RuntimeError("FFmpeg must be on PATH")
     probe = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(source)],
                            capture_output=True, text=True)
-    match = re.search(r"Duration:\\s*(\\d+):(\\d+):(\\d+(?:\\.\\d+)?)", probe.stderr)
+    match = re.search(r"Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)", probe.stderr)
     if not match:
         raise ValueError("Could not determine video duration")
     hours, minutes, seconds = match.groups()
