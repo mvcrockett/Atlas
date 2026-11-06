@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<canvas version="1.2" width="480" height="270" xres="2834.645752" yres="2834.645752" view-box="-4.8 2.7 4.8 -2.7" antialias="1" fps="8" begin-time="0f" end-time="40f" bgcolor="0.09 0.10 0.19 1.0" name="Original character test">
-  <meta name="grid_show" content="0"/>
+<canvas id="root" version="1.0" width="480" height="270" xres="2834.645752" yres="2834.645752" view-box="-4.8 2.7 4.8 -2.7" antialias="1" fps="8" begin-time="0f" end-time="40f" bgcolor="0.09 0.10 0.19 1.0" name="Original character test">
   <layer type="circle" active="true" exclude_from_rendering="false" version="0.1">
     <param name="z_depth"><real value="0"/></param>
     <param name="amount"><real value="1"/></param>
