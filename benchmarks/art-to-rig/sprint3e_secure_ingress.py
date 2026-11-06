@@ -2,6 +2,7 @@
 import os
 import pathlib
 import hashlib
+import hmac
 import json
 import urllib.request
 import urllib.parse
@@ -14,7 +15,7 @@ REQUIRED = ["manifest.json", "reference_source.png"]
 
 def validate_and_extract(raw, destination, expected_sha):
     digest = hashlib.sha256(raw).hexdigest()
-    if len(expected_sha) != 64 or not hashlib.compare_digest(digest, expected_sha.lower()):
+    if len(expected_sha) != 64 or not hmac.compare_digest(digest, expected_sha.lower()):
         raise ValueError("Bundle SHA256 mismatch")
     dst = pathlib.Path(destination)
     dst.mkdir(parents=True, exist_ok=True)
