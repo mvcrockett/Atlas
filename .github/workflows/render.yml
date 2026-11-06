@@ -23,6 +23,7 @@ on:
       - motion_sprint2.py
       - motion_sprint21.py
       - motion_sprint22.py
+      - motion_sprint23.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -84,6 +85,8 @@ jobs:
         run: python motion_sprint21.py
       - name: Verify layered arm rig, geometry and real-video-driven before-after
         run: python motion_sprint22.py
+      - name: Compare source MediaPipe skeleton against original rig and flag jumps
+        run: python motion_sprint23.py
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
@@ -102,5 +105,8 @@ jobs:
             output/motion_sprint21/before_after.png
             output/motion_sprint22/metrics.json
             output/motion_sprint22/before_after.png
+            output/motion_sprint23/metrics.json
+            output/motion_sprint23/comparison_first.png
+            output/motion_sprint23/comparison_middle.png
             output/fish.gif
             output/fish.mp4
