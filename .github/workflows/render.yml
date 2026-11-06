@@ -17,6 +17,7 @@ on:
       - anime_layers.py
       - rig2.py
       - rig2.json
+      - rig21.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -62,6 +63,10 @@ jobs:
         run: python anime_layers.py
       - name: Render layered Character Rig 2.0 performance
         run: python rig2.py --config rig2.json
+      - name: Generate original RGBA PNG asset pack on disk
+        run: python rig21.py --make-demo
+      - name: Render imported Character Rig 2.1
+        run: python rig21.py --manifest assets/rig21/manifest.json
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
