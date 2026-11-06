@@ -11,6 +11,8 @@ on:
       - storyboard.json
       - phase4.py
       - phase4.json
+      - audio.py
+      - audio.json
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -50,9 +52,13 @@ jobs:
         run: python characters.py --config storyboard.json
       - name: Render Phase 4 expressive storyboard
         run: python phase4.py --config phase4.json
+      - name: Create original audio test tone (no copyrighted material)
+        run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
+      - name: Render Phase 5 synchronized audio MVP
+        run: python audio.py --config audio.json
       - uses: actions/upload-artifact@v4
         with:
-          name: no-pants-studio-phase4
+          name: no-pants-studio-phase5
           path: |
             output/**/*.gif
             output/**/*.mp4
