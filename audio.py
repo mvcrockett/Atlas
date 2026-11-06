@@ -5,6 +5,7 @@ No external services. Only local user-provided audio; no assumed music licenses.
 import argparse
 import json
 import math
+import re
 import shutil
 import subprocess
 import wave
@@ -35,12 +36,15 @@ def mux(config):
         raise ValueError("Existing silent MP4 required")
     if source.resolve() == destination.resolve():
         raise ValueError("Output must not overwrite source video")
-    if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
-        raise RuntimeError("FFmpeg and FFprobe must be on PATH")
-    probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
-                            "format=duration", "-of", "default=noprint_wrappers=1:nokey=1",
-                            str(source)], capture_output=True, text=True, check=True)
-    duration = float(probe.stdout.strip())
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError("FFmpeg must be on PATH")
+    probe = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(source)],
+                           capture_output=True, text=True)
+    match = re.search(r"Duration:\\s*(\\d+):(\\d+):(\\d+(?:\\.\\d+)?)", probe.stderr)
+    if not match:
+        raise ValueError("Could not determine video duration")
+    hours, minutes, seconds = match.groups()
+    duration = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
     if duration <= 0:
         raise ValueError("Invalid video duration")
     tracks = config.get("tracks", [])
