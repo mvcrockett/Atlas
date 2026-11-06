@@ -1,0 +1,59 @@
+{
+  "version": "1.2",
+  "mission_lock": {
+    "max_primary_missions": 1,
+    "max_unplanned_prerequisites": 1,
+    "scope_expansion_requires_approval": true
+  },
+  "attempts": {
+    "max_materially_distinct_per_blocker": 2,
+    "parameter_tweak_resets_counter": false
+  },
+  "budget": {
+    "paid_api_usd": 0,
+    "paid_gpu_usd": 0,
+    "desktop_required": false
+  },
+  "reuse_first": true,
+  "visual_gate": {
+    "approved_reference_required": true,
+    "real_generative_video_required": true,
+    "procedural_fixture_counts_as_anime": false,
+    "technical_success_implies_artistic_success": false,
+    "requires_human_review": true,
+    "minimum_weighted_score": 85,
+    "minimum_subscores": {
+      "anime_style": 8,
+      "identity": 8,
+      "motion": 8,
+      "anatomy": 7
+    },
+    "weights": {
+      "anime_style": 25,
+      "identity": 20,
+      "motion": 20,
+      "anatomy": 15,
+      "expression": 10,
+      "temporal_stability": 10
+    },
+    "missing_evidence_status": "UNVERIFIED"
+  },
+  "report_categories": [
+    "infrastructure",
+    "generative_video",
+    "artistic_quality"
+  ],
+  "required_evidence": [
+    "source_reference",
+    "actual_video_artifact",
+    "playback_inspection",
+    "quality_assessment",
+    "user_approval"
+  ],
+  "stop_on": [
+    "attempt_budget_exhausted",
+    "paid_service_required_without_approval",
+    "missing_critical_input",
+    "scope_drift"
+  ]
+}
