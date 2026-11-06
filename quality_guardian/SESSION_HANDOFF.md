@@ -177,3 +177,12 @@ MISSION: find actual free hosted execution path for anime-specialized I2V, prese
 - Standard GitHub-hosted runners in PUBLIC repositories are normally free under GitHub's public repository Actions policy; this is eligibility, not confirmation of specific account billing state or execution. Do not trigger any runner with potentially billable nonstandard configuration. Existing YAML ubuntu-latest is standard.
 - No verified blocker in adapter/tests has been demonstrated, so NO speculative code changes. Existing code and all commits preserved. No verified workflow run or logs; no confirmed endpoint HTTP result; no MP4; no quality score. Paid spend $0, GPU jobs submitted 0.
 - Next continuation: seek a genuinely capable read-only GitHub Actions run listing or another $0 runner with accessible execution evidence; only then interpret logs and fix actual failures. If no such capability, report honest stop rather than another upload, browser, or code rewrite loop.
+
+
+## NPAS v2.0 — New run-evidence route: public workflow status badge (2026-11-06)
+- Continued from handoff cc4fd57e200687c1a71d832b0889382de0adf510. No repeats of prior PR-filtered connector run query or direct GitHub API run-listing approach.
+- Newly identified GitHub-supported public workflow status badge: https://github.com/mvcrockett/Atlas/actions/workflows/no-pants-wan-preflight.yml/badge.svg . GitHub's official documentation confirms status badges report recent workflow passing/failing status, with optional branch/event selectors. Badge can supply a status signal but not full logs, proof of particular steps, or GPU output.
+- Attempted direct web retrieval of exact badge URL; environment returned DisabledError before badge SVG could be inspected. This is an access limitation, NOT evidence of passing, failing, or absence of a run. No new run-history proof.
+- Circuit breaker: STOP; do not keep trying web mirrors, badges, third-party proxies or previous methods. No new verified code defect, so do not rewrite workflow or adapter. No manual website instructions to owner.
+- No new files/code, no paid service, no TinyFish automation, no GPU job, no anime MP4, no verified Actions execution. Source code and preflight workflow preserved unchanged. Handoff-only update for audit.
+- Re-entry condition: genuinely new connected tool that can list push/workflow_dispatch GitHub Actions runs or a trusted run-status artifact supplied by an accessible integration. Otherwise remain blocked and report accurately.
