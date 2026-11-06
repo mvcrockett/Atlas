@@ -1,0 +1,79 @@
+name: NoPants 7E Native Stretchy 5s CPU Calibration
+on:
+  push:
+    branches: [no-pants-sprint7e-native-private-ingress]
+    paths:
+      - benchmarks/native7e/**
+      - .github/workflows/no-pants-7e-native-calibration.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: CPU prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg espeak unzip python3-pil
+      - name: Generate PUBLIC synthetic artwork and original demo dialogue
+        run: |
+          python3 benchmarks/native7e/make_public_fixture.py
+          echo "Our anime engine is moving with the soundtrack." > art/dialogue.txt
+          espeak -v en-us -s 175 -w art/dialogue.wav -f art/dialogue.txt
+      - name: Execute actual Rhubarb CPU and map 120 frames
+        run: |
+          curl -fL --retry 2 --max-time 150 -o /tmp/rhubarb.zip https://github.com/DanielSWolf/rhubarb-lip-sync/releases/download/v1.14.0/Rhubarb-Lip-Sync-1.14.0-Linux.zip
+          unzip -q /tmp/rhubarb.zip -d /tmp/rhubarb-bin
+          R="$(find /tmp/rhubarb-bin -type f -name rhubarb | head -1)"
+          test -n "$R"
+          chmod +x "$R"
+          "$R" --recognizer pocketSphinx --exportFormat json --dialogFile art/dialogue.txt --output art/rhubarb.json art/dialogue.wav
+          python tools/nopants7c/schedule.py art/rhubarb.json --output art/schedule.json --fps 24 --duration 5
+      - name: Clone pinned upstream Stretchy Native Renderer
+        run: |
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.html" ./bridge7e.html
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.js" ./bridge7e.js
+          cp -a "$GITHUB_WORKSPACE/art" ./art
+      - name: Install headless Chromium
+        run: |
+          cd benchmarks/native7e
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start native engine
+        run: |
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/stretchy7e.log" 2>&1 &
+          for i in {1..90}; do
+            if curl -fsS http://127.0.0.1:5173/bridge7e.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo "Native test server never started"
+          exit 1
+      - name: Render genuine native 120-frame control with audio
+        run: |
+          node benchmarks/native7e/capture7e.mjs
+          cat output/nopants7e/metrics.json
+      - name: Publish SYNTHETIC calibration only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-7e-public-synthetic-native-control
+          path: |
+            output/nopants7e/native7e.mp4
+            output/nopants7e/metrics.json
+            output/nopants7e/inspect_*.png
+          if-no-files-found: warn
+          retention-days: 7
