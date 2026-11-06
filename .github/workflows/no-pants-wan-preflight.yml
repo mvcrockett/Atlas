@@ -1,0 +1,39 @@
+name: No Pants - Free Wan Preflight
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'quality_guardian/niftyvid_wan_adapter.py'
+      - 'quality_guardian/test_niftyvid_wan_adapter.py'
+      - '.github/workflows/no-pants-wan-preflight.yml'
+permissions:
+  contents: read
+jobs:
+  offline-contract-and-free-endpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Python adapter with offline unit tests
+        run: python -m unittest discover -s quality_guardian -p 'test_niftyvid_wan_adapter.py' -v
+      - name: Inspect public Gradio endpoint (GET only, no GPU inference)
+        env:
+          SPACE: https://cbensimon-wan2-2-fp8da-aoti-preview2.hf.space
+        run: |
+          python - <<'PY'
+          import os, urllib.request, urllib.error
+          url = os.environ["SPACE"] + "/config"
+          try:
+              req = urllib.request.Request(url, headers={"User-Agent": "NoPantsStudio/0.1"})
+              with urllib.request.urlopen(req, timeout=12) as r:
+                  body = r.read(1024*1024)
+                  print("GET /config HTTP", r.status, "bytes", len(body))
+                  print("generator function mentioned:", b"generate_video" in body)
+                  if r.status != 200 or b"generate_video" not in body:
+                      raise SystemExit("Preflight failed: endpoint contract not confirmed")
+          except (urllib.error.URLError, TimeoutError) as exc:
+              raise SystemExit("Preflight unavailable (no generation attempted): " + str(exc))
+          PY
+      - name: Confirm no GPU jobs or charges
+        if: always()
+        run: echo 'This workflow only runs Python tests and one GET /config. No uploads, no generation, no paid services.'
