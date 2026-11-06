@@ -6,6 +6,8 @@ on:
       - animate.py
       - studio.py
       - scenes.json
+      - characters.py
+      - storyboard.json
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -20,13 +22,15 @@ jobs:
           python-version: '3.11'
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements.txt
-      - name: Preserve legacy fish render
+      - name: Preserve Phase 1 legacy fish
         run: python animate.py
-      - name: Render configured scenes
+      - name: Preserve Phase 2 configured scenes
         run: python studio.py --config scenes.json
+      - name: Render Phase 3 character storyboard
+        run: python characters.py --config storyboard.json
       - uses: actions/upload-artifact@v4
         with:
-          name: no-pants-studio-animations
+          name: no-pants-studio-phase3
           path: |
             output/**/*.gif
             output/**/*.mp4
