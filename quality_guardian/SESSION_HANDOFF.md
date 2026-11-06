@@ -204,3 +204,12 @@ MISSION: find actual free hosted execution path for anime-specialized I2V, prese
 - No GPU generation, no uploaded image, no job ID, no video output, no charges. At most two candidates exhausted; STOP, no third service. Existing adapter, tests, workflow, CPU finishing code and visual quality gates unchanged.
 - Recommendation: park automatic generation until a genuine $0 reachable execution surface can verify the exact AnimeGen API, upload a single approved heroine portrait, monitor job and retrieve MP4. Do not repeat manual phone instructions or claim one-button studio complete. User should not be asked to do setup homework.
 - This is a handoff-only update, no production code modification.
+
+
+## NPAS v2.0 — AnimeGen-specific $0 capability gate (2026-11-06)
+- Resumed from commit 3464cc39ee55ccc257501abb9b6033cfd8266989; scope ONLY official AIdeaLab AnimeGen-I2V and a genuinely new free connected execution capability. No manual website steps, no TinyFish paid browser automation, no GPU charges, no speculative code.
+- Live official Space landing page https://huggingface.co/spaces/aidealab/AnimeGen-I2V was accessible through read-only web retrieval and reported 'Running on Zero'. This confirms public landing status ONLY; it does not confirm working inference, Gradio endpoint schema, queue/job status, or MP4 retrieval.
+- Tried read-only https://aidealab-animegen-i2v.hf.space/gradio_api/info through web access; inaccessible via available web tool (internal error). Do NOT treat this as proof Space is down.
+- Inspected currently available connected capabilities. Runway has video generation but consumes credits; TinyFish run_web_automation has uncappable paid step risk previously blocked; TinyFish fetch_content is a read-only page extractor, not a documented arbitrary Gradio POST/upload/job executor and no $0 billing guarantee established. GitHub connector provides file operations but no arbitrary HTTP, general Actions run listing or workflow dispatch. No verified free connector can submit an AnimeGen image and poll/download MP4 autonomously.
+- STOP: exact AnimeGen Gradio API unverified, no actual image upload, no job ID, no MP4. No code changes or paid execution. Do not repeat inaccessible endpoint probes. Await genuinely new accessible no-cost execution capability, or separately authorized architecture change; retain all existing code and strict $0.
+- This update modifies handoff only. Paid spend $0; GPU submissions 0; quality UNVERIFIED.
