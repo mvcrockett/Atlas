@@ -1,21 +1,36 @@
-# Quality Guardian — Mission 01 handoff
+# Quality Guardian — Mission 02 handoff
 Date: 2026-11-06
-Status: Mission 01 COMPLETE. Four new files committed and verified by GitHub readback; JSON parsed. No automated CI enforcement installed.
+Status: BLOCKED ON CRITICAL INPUT. Original heroine reference image not available as an approved attachment; user asked to upload. No substitution authorized.
 
-## Mission 01 contract
-Deliverable: minimal persistent charter, machine-readable gates, parking lot, and handoff. No new renderer, dashboard, database, agent framework or anime generation. Budget: $0. Preserve existing code. Max two materially distinct attempts per blocker.
+## Mission contract
+One mission: obtain/approve ORIGINAL lavender heroine reference, then assess free phone-accessible remote image-to-video options. $0 paid APIs/GPU. No local desktop, new renderer, dashboard, database or agent framework. Maximum two materially distinct attempts per blocker. Exit on verified approved reference and real tested footage, or explicit blocker.
 
-## Three-category scoreboard
-- Infrastructure: prior working MP4/GIF assembly and GitHub Actions demonstrated; Quality Guardian docs subject to readback.
-- Generative video: NOT VERIFIED. Wan launcher static-only; remote image-to-video not tested.
-- Artistic anime: NOT VERIFIED. No accepted generated anime shot.
-- Attempts: 0/2 per blocker at creation.
+## Evidence gathered
+- Read NO_PANTS_CHARTER.md, QUALITY_GATES.json, and prior SESSION_HANDOFF.md from GitHub.
+- Original candidate character image was generated in prior conversation, not confirmed as an approved repo asset. User upload/approval requested.
+- Remote service research (provider-advertised, NOT execution verified):
+  1. NiftyVid https://igorcsis.github.io/nifty-vid/ — Wan 2.2 image-to-video, public shared GPU, no account/API key advertised, 4.5-second cap, unstable queues.
+  2. Wan 2.2 Studio https://wan2.video/wan2-2-studio — public ZeroGPU embedded workflow, quotas and queues, five-second capability not tested.
+  3. https://stablediffusion.fr/wan — third-party free Wan 2.2 I2V demo, about five seconds, host-dependent availability.
+- Hugging Face official ZeroGPU docs https://huggingface.co/docs/hub/en/spaces-zerogpu list shared free quotas: unauthenticated 2 GPU minutes/day, free account 5 minutes/day, PRO 40 minutes/day; these are not guaranteed successful generations.
+- Wan open model repo Apache-2.0 reported in existing Sprint 2 research; exact checkpoints, hosted demo policies, and commercial use terms must be checked before production.
+- No remote generator executed; no playable MP4 produced or visually inspected.
+
+## Anti-waste scoreboard
+- Primary mission: PARTIAL, waiting for image upload/approval.
+- Materially distinct generation attempts: 0/2 (none possible without approved image).
 - Unplanned side quests: 0.
-- Paid spending: $0 initiated in Mission 01.
-- Next critical inputs: original lavender heroine reference, user approval, verified remote free compute.
+- Paid API/GPU spending initiated: $0.
+- New renderer/infrastructure: none.
+- Existing code modified: none.
 
-## Next mission — 02
-Request/upload the ORIGINAL lavender heroine reference sheet; verify its identity, ask user approval, preserve approved asset. Then shortlist and test genuine phone-accessible free remote image-to-video compute, subject to the two-attempt circuit breaker. Do not substitute a procedural cartoon.
+## Three-category progress
+- Infrastructure: prior GitHub Actions and MP4/GIF assembly preserved; no new test.
+- Generative video: NOT VERIFIED (research only).
+- Artistic anime: NOT VERIFIED (no approved reference or accepted shot).
+
+## Next action
+User uploads the ORIGINAL lavender heroine reference sheet in the chat and explicitly approves or requests revisions. Preserve only after approval. Then test one suitable genuinely free remote image-to-video service; use second materially different service only if necessary, inspect video before scoring. Do not claim the reference is in GitHub without verification.
 
 ## Exact continuation prompt
-Atlas, continue No Pants Anime Software Mission 02. Read NO_PANTS_CHARTER.md and quality_guardian/QUALITY_GATES.json and this handoff from mvcrockett/Atlas. Ask me to upload or approve the original lavender heroine reference if it is not available. Preserve the approved artwork, then verify a genuinely free phone-accessible remote image-to-video path. Do not build renderers or infrastructure. Use at most two materially distinct attempts per blocker, spend $0 on paid APIs, inspect actual generated footage before claiming success, and report the three-category scoreboard.
+Atlas, continue No Pants Anime Software Mission 02 from quality_guardian/SESSION_HANDOFF.md. I have attached the original lavender heroine reference sheet. Show it to me for approval; after I approve, preserve the canonical asset in mvcrockett/Atlas and test a genuinely free phone-accessible remote image-to-video model. Keep $0 paid spending, maximum two materially distinct attempts per blocker, no procedural-cartoon substitutes, and report real video evidence or exact blocker.
