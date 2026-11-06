@@ -1,0 +1,28 @@
+name: Quality Tournament CPU Engines
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - quality_tournament/**
+      - .github/workflows/quality-tournament.yml
+jobs:
+  cpu-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image and video utilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends blender synfig ffmpeg
+          pip install pillow
+      - name: Render same original five-second test in actual Blender and Synfig
+        run: python quality_tournament/run.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-tournament-cpu-engines
+          path: output/quality_tournament/**
