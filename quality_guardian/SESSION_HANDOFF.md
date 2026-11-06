@@ -249,3 +249,13 @@ MISSION: find actual free hosted execution path for anime-specialized I2V, prese
 - Ran local reconstructed 16-test suite: first 10 errors due to local reconstruction mismatch (_https_url called with wrong arity); after fixing locally, 6 errors due to stale local _mp4 reference; after correcting local implementation, `python -m unittest -q test_execution_bridge.py` -> Ran 16 tests in 0.566s, OK.
 - CRITICAL: 16/16 applies ONLY to locally reconstructed, modified code. Not evidence of exact committed source correctness. No code commits because tested source did not match GitHub readback. No claims that earlier GitHub code passes.
 - $0, GPU jobs 0, no paid tools, no production workflow edits. Next step: establish exact byte-for-byte source transfer OR deliberately replace GitHub files with the exact locally tested implementation via a verified content channel, then verify Git blob hashes and rerun tests. Do not repeat raw-file network downloads or GitHub Actions history.
+
+
+## NPAS Tiny Bridge Sprint — 2026-11-06: EXACT-SOURCE VERIFIED
+- Retrieved BOTH current Sprint 2 files from connected GitHub fetch_file (also fetched base64 encoding for provenance), then transferred exact source text to isolated local directory /mnt/data/nopants_exact via container heredoc. No raw network downloads, GitHub Actions retries, or approximate source reconstruction.
+- BEFORE running tests, used `git hash-object` on each local file and compared full 40-character blob SHA-1 against GitHub connector:
+  - execution_bridge.py: ccefd6a5cec77fe89c0ce6eb32794e7020d825c0 MATCH
+  - test_execution_bridge.py: d52a7d7c5afa4834d65e179fbec8be2ef23db6c7 MATCH
+- Ran `cd /mnt/data/nopants_exact && python -m unittest -v test_execution_bridge.py`: 16 tests executed in 0.571 seconds, all OK, zero failures, zero errors. This IS verification of exact GitHub-committed source bytes at the two recorded blob SHAs.
+- No source code modifications or code commits. No paid services, GPU generation, live transport, production workflow changes. Mock-only $0. Tests validate synthetic MP4 container structure, NOT real decodable generated anime video.
+- Next objective: separate anime GPU access and true MP4 generation; do not conflate mocked bridge verification with live video capability.
