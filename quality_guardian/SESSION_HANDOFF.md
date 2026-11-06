@@ -31,3 +31,10 @@ Transfer exact approved PNG to repository at assets/characters/lavender/approved
 
 ## Exact continuation prompt
 Atlas, continue No Pants Anime Software Mission 02. The new lavender heroine reference is approved. Read the latest GitHub handoff. Preserve the EXACT PNG (SHA-256 d1ade7a1873f99bd2ac7559dac3e715a700e7e5378d6972d79931cb73b22ed3d) in mvcrockett/Atlas using a supported binary upload and verify it. Then test one genuinely free remote image-to-video service, with at most two materially distinct attempts per blocker and no paid API spending. Inspect the MP4 before scoring; if upload or free execution is inaccessible, stop and report the exact user action needed.
+
+## Verification addendum — 2026-11-06
+- Re-read handoff from repository. GitHub fetch_file for assets/characters/lavender/approved_reference.png returned HTTP 404 (file absent on default branch); therefore no repository SHA-256 comparison is possible.
+- Local approved PNG independently checked: 1536x1024 RGB PNG, SHA-256 d1ade7a1873f99bd2ac7559dac3e715a700e7e5378d6972d79931cb73b22ed3d.
+- Checked current public free I2V pages: NiftyVid offers public queued Wan 2.2 image-to-video, max 4.5 sec and PNG max 8 MB; third-party stablediffusion.fr/wan advertises around five seconds; Wan2.video advertises public ZeroGPU demos. Wan-AI/Wan2.2-I2V-A14B official model card shows Apache-2.0 license. None constitutes verified GPU availability or an executed job.
+- Execution blocker: no authorized browser/computer-use interface for uploading the approved PNG to an external free demo and submitting its generation UI; no verified generated MP4 available. No actual generation was attempted; generation attempt counter remains 0/2. No paid spending.
+- No new renderer or workflow was built. Next required user action: upload exact PNG to GitHub at specified path (then readback hash) or open NiftyVid in browser and upload approved PNG, submit one short-motion prompt and return MP4 for inspection. The remote test is not complete until footage exists.
