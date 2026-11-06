@@ -1,0 +1,102 @@
+name: NoPants Synfig Fallback Benchmark
+on:
+  push:
+    branches:
+      - no-pants-sprint2-synfig-fallback
+  workflow_dispatch:
+
+jobs:
+  synfig-fallback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Synfig and FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y synfig ffmpeg python3-pil
+          synfig --version
+          ffmpeg -version | head -n 1
+
+      - name: Render exactly 48 frames with Synfig CLI
+        run: |
+          mkdir -p output/synfig-fallback/frames
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          scene='benchmarks/synfig-fallback/character.sif'
+          out=Path('output/synfig-fallback/frames')
+          for i in range(48):
+              t=f"{i/24:.6f}s"
+              fn=out/f"frame_{i:04d}.png"
+              subprocess.run(['synfig',scene,'-q','-t','png','--time',t,'-w','480','-h','270','-o',str(fn)],check=True)
+          files=sorted(out.glob('frame_*.png'))
+          assert len(files)==48, len(files)
+          print('Rendered',len(files),'frames')
+          PY
+
+      - name: Assemble 24fps MP4
+        run: |
+          ffmpeg -y -loglevel error -framerate 24 -i output/synfig-fallback/frames/frame_%04d.png -c:v libx264 -pix_fmt yuv420p output/synfig-fallback/synfig-fallback.mp4
+          ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=r_frame_rate,nb_read_frames,duration -of json output/synfig-fallback/synfig-fallback.mp4 > output/synfig-fallback/ffprobe.json
+
+      - name: Verify visible continuous motion
+        run: |
+          python3 - <<'PY'
+          from PIL import Image, ImageChops
+          from pathlib import Path
+          import hashlib, json, statistics
+          p=Path('output/synfig-fallback')
+          frames=sorted((p/'frames').glob('frame_*.png'))
+          assert len(frames)==48
+          hashes=[hashlib.sha256(f.read_bytes()).hexdigest() for f in frames]
+          diffs=[]
+          for a,b in zip(frames,frames[1:]):
+              ia=Image.open(a).convert('RGB')
+              ib=Image.open(b).convert('RGB')
+              d=ImageChops.difference(ia,ib)
+              hist=d.histogram()
+              total=sum(v*(i%256) for i,v in enumerate(hist))
+              diffs.append(total/(480*270*3))
+          probe=json.loads((p/'ffprobe.json').read_text())['streams'][0]
+          metrics={
+              'engine':'Synfig CLI',
+              'frame_count':len(frames),
+              'fps':24,
+              'unique_frame_hashes':len(set(hashes)),
+              'mean_abs_frame_difference':statistics.mean(diffs),
+              'max_abs_frame_difference':max(diffs),
+              'ffprobe':probe,
+              'paid_api_usd':0,
+              'generative_ai_used':False,
+              'placeholder_art':True,
+              'articulation':'nested lower-arm group rotates around elbow pivot'
+          }
+          assert probe['r_frame_rate']=='24/1', probe
+          assert int(probe['nb_read_frames'])==48, probe
+          assert len(set(hashes))>=20, metrics
+          assert statistics.mean(diffs)>0.01, metrics
+          (p/'metrics.json').write_text(json.dumps(metrics,indent=2))
+          print(json.dumps(metrics,indent=2))
+          PY
+
+      - name: Preserve representative evidence
+        run: |
+          mkdir -p output/synfig-fallback/representative
+          cp output/synfig-fallback/frames/frame_0000.png output/synfig-fallback/representative/
+          cp output/synfig-fallback/frames/frame_0012.png output/synfig-fallback/representative/
+          cp output/synfig-fallback/frames/frame_0024.png output/synfig-fallback/representative/
+          cp output/synfig-fallback/frames/frame_0036.png output/synfig-fallback/representative/
+          cp output/synfig-fallback/frames/frame_0047.png output/synfig-fallback/representative/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nopants-synfig-fallback-evidence
+          path: |
+            output/synfig-fallback/synfig-fallback.mp4
+            output/synfig-fallback/metrics.json
+            output/synfig-fallback/ffprobe.json
+            output/synfig-fallback/representative/*.png
+          if-no-files-found: warn
