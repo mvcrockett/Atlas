@@ -23,3 +23,8 @@ These are simple procedurally drawn cartoon characters, not generative AI, impor
 - **Phase 5: open-source audio integration:** optional locally generated character voices (evaluate Piper TTS voice/model licenses and runtime requirements), user-recorded dialogue, original or appropriately licensed music and sound effects, and FFmpeg mixing with timeline synchronization, volume balancing, and MP4 audio muxing.
 - Preserve silent GIF exports (GIF does not support audio). MP4 will carry synchronized sound once Phase 5 is implemented.
 - No paid services, no assumed commercial-use rights, and no heavyweight speech model installation until benchmarked.
+
+## Phase 4 — reusable characters, expressive poses and wrapped dialogue
+Run `python phase4.py --config phase4.json` to render `output/phase4_story/phase4_story.gif` and `.mp4`. Named character profiles in `phase4.json` control outfit color (lavender, coral, mint, blue), hair (dark, brown, gold) and horizontal position. Each shot chooses a character, background (garden, studio, night), pose (idle, wave, jump, walk), expression (happy, surprised, sad, sleepy, neutral), duration, caption, and optional `transition: fade` (otherwise cut). Eased jumping and crossfade transitions improve movement; captions automatically wrap to up to three lines.
+
+The Phase 4 workflow also renders the original fish and every Phase 2–3 example. This is a simple procedural 2D animation engine; it does not yet provide sprite import, audio, a GUI, or lip synchronization. Phase 5 voice/music/sound effects/FFmpeg mixing remains **planned only**.
