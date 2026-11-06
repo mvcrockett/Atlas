@@ -19,6 +19,7 @@ on:
       - rig2.json
       - rig21.py
       - visual_quality.py
+      - motion_sprint1.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -70,6 +71,8 @@ jobs:
         run: python rig21.py --manifest assets/rig21/manifest.json
       - name: Compare original PNG art refinements with baseline Rig 2.1
         run: python visual_quality.py
+      - name: Verify decoded video to tracked arm motion and character animation
+        run: python motion_sprint1.py
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
@@ -81,5 +84,7 @@ jobs:
             output/**/*.gif
             output/**/*.mp4
             output/visual_quality/before_after.png
+            output/motion_sprint1/motion.json
+            output/motion_sprint1/reference.mkv
             output/fish.gif
             output/fish.mp4
