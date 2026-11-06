@@ -24,6 +24,7 @@ on:
       - motion_sprint21.py
       - motion_sprint22.py
       - motion_sprint23.py
+      - quality_pivot.py
       - requirements.txt
       - .github/workflows/render.yml
 jobs:
@@ -87,6 +88,8 @@ jobs:
         run: python motion_sprint22.py
       - name: Compare source MediaPipe skeleton against original rig and flag jumps
         run: python motion_sprint23.py
+      - name: Audit six animation engine benchmark paths without pretending to render them
+        run: python quality_pivot.py
       - name: Create original audio test tone (no copyrighted material)
         run: python audio.py --make-demo-tone assets/audio/demo_tone.wav
       - name: Render Phase 5 synchronized audio MVP
@@ -108,5 +111,6 @@ jobs:
             output/motion_sprint23/metrics.json
             output/motion_sprint23/comparison_first.png
             output/motion_sprint23/comparison_middle.png
+            output/quality_pivot/readiness.json
             output/fish.gif
             output/fish.mp4
