@@ -33,7 +33,7 @@ def flow_interpolate(a,b,t):
  wb=cv2.remap(b,xx-fb[:,:,0]*(1-t),yy-fb[:,:,1]*(1-t),cv2.INTER_LINEAR,borderMode=cv2.BORDER_REFLECT)
  return cv2.addWeighted(wa,1-t,wb,t,0)
 def main():
- ap=argparse.ArgumentParser();ap.add_argument("--keyframes",default="continuous_engine/keyframes");ap.add_argument("--method",choices=["flow","blend"],default="flow");args=ap.parse_args()
+ ap=argparse.ArgumentParser();ap.add_argument("--keyframes",default="continuous_engine/keyframes");ap.add_argument("--method",choices=["flow","blend"],default="flow");ap.add_argument("--seconds",type=int,choices=[5,10],default=5);args=ap.parse_args()
  ROOT.mkdir(parents=True,exist_ok=True);source=Path(args.keyframes)
  files=sorted(source.glob("*.png"))
  fixture_used=False
@@ -43,7 +43,7 @@ def main():
  images=[np.array(Image.open(p).convert("RGB").resize((480,270))) for p in files]
  assert len({a.shape for a in images})==1
  frame_dir=ROOT/"frames";frame_dir.mkdir(exist_ok=True)
- start=time.monotonic();out=[];total=120
+ start=time.monotonic();out=[];total=args.seconds*24
  for n in range(total):
   pos=n*(len(images)-1)/(total-1);i=min(int(pos),len(images)-2);t=pos-i
   if t<=1e-8:frame=images[i].copy()
@@ -60,8 +60,8 @@ def main():
  Image.fromarray(out[0]).save(ROOT/"continuous.gif",save_all=True,append_images=[Image.fromarray(x) for x in out[1:]],duration=42,loop=0,optimize=False)
  diffs=[float(np.mean(np.abs(out[i].astype(np.float32)-out[i-1].astype(np.float32)))) for i in range(1,total)]
  jumps=[i for i,x in enumerate(diffs,1) if x>18]
- metrics={"method":args.method,"optical_flow":"Farneback CPU (not RIFE, not generative AI)","frame_count":total,"fps":24,"seconds":5,"keyframe_count":len(files),"fixture_used":fixture_used,"candidate_art_approved":False,"real_ai_keyframes_used":not fixture_used,"frame_resolution":[480,270],"mean_frame_difference":float(np.mean(diffs)),"max_frame_difference":max(diffs),"large_pixel_change_frame_indices":jumps,"render_seconds":round(time.monotonic()-start,2),"anatomy_verified":False,"identity_consistency_verified":False,"limitations":"Optical flow warps and blends pixels; cannot draw missing fingers or unseen anatomy. Pixel difference alone does not measure perceptual flicker. Manual visual inspection required.","paid_api_usd":0}
+ metrics={"method":args.method,"optical_flow":"Farneback CPU (not RIFE, not generative AI)","frame_count":total,"fps":24,"seconds":args.seconds,"keyframe_count":len(files),"fixture_used":fixture_used,"candidate_art_approved":False,"real_ai_keyframes_used":not fixture_used,"frame_resolution":[480,270],"mean_frame_difference":float(np.mean(diffs)),"max_frame_difference":max(diffs),"large_pixel_change_frame_indices":jumps,"render_seconds":round(time.monotonic()-start,2),"anatomy_verified":False,"identity_consistency_verified":False,"limitations":"Optical flow warps and blends pixels; cannot draw missing fingers or unseen anatomy. Pixel difference alone does not measure perceptual flicker. Manual visual inspection required.","paid_api_usd":0}
  (ROOT/"metrics.json").write_text(json.dumps(metrics,indent=2))
- assert len(out)==120 and (ROOT/"continuous.mp4").stat().st_size>10000
+ assert len(out)==total and (ROOT/"continuous.mp4").stat().st_size>10000
  print(json.dumps(metrics,indent=2))
 if __name__=="__main__":main()
