@@ -1,0 +1,29 @@
+name: NoPants 4A International Interface Readiness
+
+on:
+  push:
+    branches:
+      - no-pants-4a-international-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  see-through-stretchy-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify upstream code interfaces without any artwork or model downloads
+        run: python benchmarks/international/verify_contracts.py
+      - name: Upload public-source-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-4a-upstream-contracts-only
+          path: output/4a/interface_readiness.json
+          if-no-files-found: warn
