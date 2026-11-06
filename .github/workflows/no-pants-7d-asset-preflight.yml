@@ -1,0 +1,21 @@
+name: NoPants 7D Private Art Manifest Preflight (Synthetic Only)
+on:
+  push:
+    branches: [no-pants-sprint7d-pixel-locked-native-proof]
+    paths:
+      - tools/nopants7d/**
+      - .github/workflows/no-pants-7d-asset-preflight.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run source-free synthetic private asset manifest validation
+        run: python tools/nopants7d/test_manifest.py
