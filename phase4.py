@@ -88,7 +88,7 @@ def render(story,profiles,root=Path("output")):
     frames=folder/"frames";frames.mkdir(exist_ok=True)
     for stale in frames.glob("frame_*.png"):stale.unlink()
     all_frames=[]
-    for shot in shots:
+    for shot_index,shot in enumerate(shots):
         profile=profiles[shot["character"]]
         assert profile["color"] in PALETTES and profile.get("hair","dark") in ("dark","brown","gold")
         count=round(float(shot["duration"])*fps);assert fps//2<=count<=fps*10
@@ -96,7 +96,8 @@ def render(story,profiles,root=Path("output")):
         # Crossfade the first few frames of each new shot into the previous shot.
         if all_frames and shot.get("transition","cut")=="fade":
             fade=min(6,len(sequence),len(all_frames))
-            prior=all_frames[-1]
+            previous_shot=shots[shot_index-1]
+            prior=frame(w,h,previous_shot,profiles[previous_shot["character"]],1.0,show_caption=False)
             for i in range(fade):
                 alpha=ease((i+1)/fade)
                 sequence[i]=Image.blend(prior,sequence[i],alpha)
