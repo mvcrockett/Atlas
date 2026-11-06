@@ -1,0 +1,83 @@
+# STAGED ONLY. PRIVATE CONTENT. DO NOT MERGE TO MAIN UNTIL OWNER HAS
+# APPROVED A HOST, CREATED PROTECTED ENVIRONMENT nopants-private, REVIEWED
+# RUNNER SECURITY, AND CONFIGURED ITS 3 ENCRYPTED SECRETS.
+name: NoPants 7G PRIVATE Native Heroine (Staged — Protected Environment)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-native-render:
+    runs-on: ubuntu-24.04
+    environment: nopants-private
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install free native runner tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg python3-pil python3-cryptography
+      - name: Fail closed and verify owner-provided private art
+        env:
+          NOPANTS_ART_BUNDLE_URL: ${{ secrets.NOPANTS_ART_BUNDLE_URL }}
+          NOPANTS_ART_BUNDLE_SHA256: ${{ secrets.NOPANTS_ART_BUNDLE_SHA256 }}
+          NOPANTS_EVIDENCE_KEY_HEX: ${{ secrets.NOPANTS_EVIDENCE_KEY_HEX }}
+          NOPANTS_ASSET_DIR: ${{ runner.temp }}/nopants7g-private-art
+        run: |
+          umask 077
+          /usr/bin/python3 tools/nopants7g/private_bridge.py ingress
+      - name: Prepare pinned upstream native Stretchy engine
+        run: |
+          umask 077
+          git clone https://github.com/MangoLion/stretchystudio.git "$RUNNER_TEMP/stretchystudio"
+          cd "$RUNNER_TEMP/stretchystudio"
+          git checkout 24a83a27ba43e43e9d2e3de5e33994594e6199c2
+          pnpm install --no-frozen-lockfile
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.html" ./bridge7e.html
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.js" ./bridge7e.js
+          mkdir -p art
+          cp -a "$RUNNER_TEMP/nopants7g-private-art/." ./art/
+      - name: Install browser for supported Ubuntu
+        run: |
+          cd benchmarks/native7e
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Launch native browser service locally
+        run: |
+          umask 077
+          cd "$RUNNER_TEMP/stretchystudio"
+          nohup pnpm dev --host 127.0.0.1 > "$RUNNER_TEMP/nopants7g-vite-private.log" 2>&1 &
+          for i in {1..90}; do
+            curl -fsS http://127.0.0.1:5173/bridge7e.html >/dev/null && exit 0
+            sleep 1
+          done
+          echo "Native renderer did not become ready; private logs not uploaded"
+          exit 1
+      - name: Render 120 frames, 5-second private native scene
+        run: |
+          umask 077
+          node benchmarks/native7e/capture7e.mjs > "$RUNNER_TEMP/nopants7g-capture-private.log" 2>&1 || {
+            echo "Native private render failed; private logs intentionally withheld"
+            exit 1
+          }
+          echo "Private render completed; preparing encrypted output only"
+      - name: Encrypt all private render evidence
+        env:
+          NOPANTS_EVIDENCE_KEY_HEX: ${{ secrets.NOPANTS_EVIDENCE_KEY_HEX }}
+        run: |
+          umask 077
+          /usr/bin/python3 tools/nopants7g/private_bridge.py seal
+          test -s output/nopants7g/sealed_evidence.aesgcm
+      - name: Upload CIPHERTEXT ONLY
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-7g-private-encrypted-native-evidence
+          path: output/nopants7g/sealed_evidence.aesgcm
+          if-no-files-found: error
+          retention-days: 1
