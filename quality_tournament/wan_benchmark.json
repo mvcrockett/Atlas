@@ -1,0 +1,41 @@
+{
+  "benchmark_id": "operation-no-pants-anime-v1",
+  "approval_status": "candidate_reference_not_approved",
+  "reference_image": "candidate anime heroine sheet generated in conversation; user must save approved PNG to local ComfyUI/input/lavender_reference.png; not committed to GitHub",
+  "rights": "original AI-generated candidate artwork; no licensed third-party character",
+  "target": {
+    "seconds": 5,
+    "fps": 24,
+    "frames": 120,
+    "width": 768,
+    "height": 432
+  },
+  "smoke_test": {
+    "seconds_approx": 2,
+    "fps": 16,
+    "frames": 33,
+    "width": 512,
+    "height": 288,
+    "warning": "Wan model workflow may impose supported frame counts and resolution; use template defaults when incompatible"
+  },
+  "prompt": "Original adult anime heroine with shoulder-length dark auburn-plum hair, vivid green eyes, lavender blazer and cream blouse, waist-up, clean hand-drawn cel-shaded anime aesthetic. Stationary camera, single person. She raises her right hand, waves gently once, then lowers it. Maintain exact facial identity, hand anatomy, clothing, hairstyle and background. No cuts, text, extra hands or extra people.",
+  "negative_prompt": "extra fingers, extra limbs, duplicate person, flicker, facial distortion, changing clothes, changing hairstyle, subtitles, text, camera cuts",
+  "seed": 23052026,
+  "source": "Original candidate reference pending user approval",
+  "execution": {
+    "comfyui_gpu_tested": false,
+    "video_generated": false,
+    "workflow_api_json_verified": false,
+    "manual_step": "Use official ComfyUI Wan2.2 5B TI2V workflow template; load approved image and enter prompt; first use small supported smoke test; record settings and save resulting metadata."
+  },
+  "scoring": [
+    "identity",
+    "facial_anatomy",
+    "hands",
+    "motion",
+    "flicker",
+    "render_seconds",
+    "peak_vram_mb"
+  ],
+  "commercial_rights_check": "Verify terms of each exact model checkpoint and any included assets before commercial distribution"
+}
