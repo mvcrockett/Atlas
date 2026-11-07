@@ -1,0 +1,51 @@
+name: NoPants Encryption Portal Browser Tests — NO DEPLOY
+on:
+  push:
+    branches: [no-pants-encryption-portal-predeploy]
+    paths:
+      - docs/nopants/encryption-portal/**
+      - .github/workflows/no-pants-encryption-portal-tests.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-local-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium test harness (free, synthetic test only)
+        run: |
+          cd docs/nopants/encryption-portal
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Static no-upload and CSP audit
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("docs/nopants/encryption-portal")
+          html=(p/"index.html").read_text()
+          script=(p/"portal.js").read_text()
+          assert "connect-src 'none'" in html
+          assert "form-action 'none'" in html
+          for forbidden in ("fetch(", "XMLHttpRequest(", "sendBeacon(", "WebSocket(", "import(", "serviceWorker.register(", "http://", "https://"):
+              assert forbidden not in script, f"Disallowed network primitive: {forbidden}"
+          assert "crypto.subtle.encrypt" in script
+          assert "AES-GCM" in script and "PBKDF2" in script
+          print("PASS static local-only CSP and crypto audit")
+          PY
+      - name: Start localhost HTTPS-equivalent secure-context test server
+        run: |
+          nohup python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/portal-server.log" 2>&1 &
+          for i in {1..25}; do
+            curl -fsS http://127.0.0.1:8765/docs/nopants/encryption-portal/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Real Chromium browser test: narrow mobile viewport, no uploads, ciphertext authenticated
+        run: |
+          cd docs/nopants/encryption-portal
+          node test-portal.cjs
