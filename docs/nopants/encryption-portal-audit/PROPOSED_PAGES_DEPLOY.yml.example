@@ -1,0 +1,41 @@
+# PROPOSAL ONLY. File extension .example prevents GitHub Actions execution.
+# NEVER copy to .github/workflows on main or change Pages settings without
+# Victoria's separate explicit approval of this exact publication plan.
+name: No Pants Portal - Manually Publish Audited Three-File Site
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: nopants-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out approved pinned portal source
+        uses: actions/checkout@v4
+        with:
+          ref: 57c0bb03dfcf7490af1b9e198cac7b3ad3573fd7
+          persist-credentials: false
+      - name: Build minimal portal artifact only
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/nopants-pages"
+          cp docs/nopants/encryption-portal/index.html "$RUNNER_TEMP/nopants-pages/index.html"
+          cp docs/nopants/encryption-portal/portal.css "$RUNNER_TEMP/nopants-pages/portal.css"
+          cp docs/nopants/encryption-portal/portal.js "$RUNNER_TEMP/nopants-pages/portal.js"
+          touch "$RUNNER_TEMP/nopants-pages/.nojekyll"
+          test "$(find "$RUNNER_TEMP/nopants-pages" -maxdepth 1 -type f | wc -l)" -eq 4
+          ! grep -R -E 'NoPants_Sprint7F|PRIVATE_CANONICAL_EXPERIMENTAL|<script src="https?://' "$RUNNER_TEMP/nopants-pages"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/nopants-pages
+      - id: deployment
+        uses: actions/deploy-pages@v4
