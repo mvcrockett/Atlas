@@ -30,6 +30,7 @@ const path=require('node:path');
   await page.goto(url,{waitUntil:'networkidle'});
   if(!await page.evaluate(()=>window.isSecureContext&&!!crypto.subtle))throw Error('Localhost secure context lacks WebCrypto');
   if(!await page.locator('#encrypt').isEnabled())throw Error('Encryption control unavailable');
+  await page.screenshot({path:path.join(process.cwd(),'portal-preview.png'),fullPage:true});
   await page.locator('#source').setInputFiles({name:'synthetic-fixture.zip',mimeType:'application/zip',buffer:data});
   const password='SYNTHETIC-STRONG-TEST-PASSPHRASE-ONLY-1234';
   await page.locator('#password').fill(password);
