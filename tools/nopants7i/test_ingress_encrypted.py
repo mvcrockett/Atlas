@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 """Source-free test for NPS7I1 encrypted Dropbox input and 7F verified contract."""
 import io, hashlib, os, pathlib, sys, tempfile, zipfile, json
 from PIL import Image
@@ -40,8 +41,8 @@ class Response:
     def geturl(self):return 'https://approved.example.org/temporary-download'
     def read(self,n):return self._data.read(n)
 import ingress_encrypted
-original=ingress_encrypted.urllib.request.urlopen
-ingress_encrypted.urllib.request.urlopen=lambda request,timeout=60:Response(cipher)
+original=ingress_encrypted.urllib.request.build_opener
+ingress_encrypted.urllib.request.build_opener=lambda *handlers:SimpleNamespace(open=lambda request,timeout=60:Response(cipher))
 try:
     with tempfile.TemporaryDirectory() as t:
         result=ingest('https://approved.example.org/temporary-download',PASSWORD,digest,pathlib.Path(t)/'private')
@@ -51,5 +52,5 @@ try:
         except ValueError:pass
         else:raise AssertionError('HTTP accepted')
 finally:
-    ingress_encrypted.urllib.request.urlopen=original
+    ingress_encrypted.urllib.request.build_opener=original
 print('PASS: password-derived AES-GCM decrypt, digest, 12-file bundle, HTTPS-only, wrong password, tamper and wrong SHA rejected; SYNTHETIC ONLY')

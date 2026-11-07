@@ -1,0 +1,33 @@
+name: NoPants 7J Native Export and HTTPS Contracts
+on:
+  push:
+    branches: [no-pants-sprint7j-native-fidelity]
+    paths:
+      - benchmarks/native7e/**
+      - tools/nopants7g/**
+      - tools/nopants7i/**
+      - .github/workflows/no-pants-7j-contract.yml
+permissions:
+  contents: read
+jobs:
+  source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow cryptography
+      - name: Synthetic and source-only contracts; no private data or secrets
+        run: |
+          node --test benchmarks/native7e/test_render_contract.mjs
+          python tools/nopants7c/test_schedule.py
+          python tools/nopants7d/test_manifest.py
+          python tools/nopants7f/test_private_transport.py
+          python tools/nopants7g/test_private_bridge.py
+          python tools/nopants7g/test_https_download.py
+          python tools/nopants7i/test_ingress_encrypted.py

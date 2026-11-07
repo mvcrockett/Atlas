@@ -46,6 +46,7 @@ jobs:
           pnpm install --no-frozen-lockfile
           cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.html" ./bridge7e.html
           cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.js" ./bridge7e.js
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/render_contract.mjs" ./render_contract.mjs
           cp -a "$GITHUB_WORKSPACE/art" ./art
       - name: Install headless Chromium
         run: |

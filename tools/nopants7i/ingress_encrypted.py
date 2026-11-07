@@ -3,6 +3,8 @@
 import hashlib, hmac, os, pathlib, sys, urllib.request, urllib.parse
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'nopants7f'))
 from private_transport import verify_bundle
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"nopants7g"))
+from https_download import fetch_https
 MAGIC=b'NPS7I1'
 MAX_CIPHERTEXT=45*1024*1024
 ITERATIONS=600000
@@ -24,17 +26,7 @@ def decrypt_blob(blob,password,expected_plain_sha256):
     return plain
 
 def fetch_ciphertext(url):
-    p=urllib.parse.urlparse(url)
-    if p.scheme!='https' or not p.hostname or p.username or p.password:
-        raise ValueError('encrypted download requires HTTPS without embedded credentials')
-    req=urllib.request.Request(url,headers={'User-Agent':'NoPants-Private-Runner-7I'})
-    with urllib.request.urlopen(req,timeout=60) as response:
-        final=urllib.parse.urlparse(response.geturl())
-        if final.scheme!='https' or final.username or final.password:
-            raise ValueError('unsafe download redirect')
-        b=response.read(MAX_CIPHERTEXT+1)
-    if len(b)>MAX_CIPHERTEXT:raise ValueError('encrypted transfer too large')
-    return b
+    return fetch_https(url,MAX_CIPHERTEXT,"NoPants-Private-Runner-7I")
 
 def ingest(url,password,expected_plain_sha256,dest):
     raw=decrypt_blob(fetch_ciphertext(url),password,expected_plain_sha256)

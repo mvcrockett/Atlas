@@ -2,6 +2,7 @@
 // This bridge contains no character artwork. Never publish private art to public Git.
 import {ScenePass} from '/src/renderer/scenePass.js';
 import {computePoseOverrides} from '/src/renderer/animationEngine.js';
+import {renderGeometry,privacyClass} from '/render_contract.mjs';
 const canvas=document.querySelector('#canvas');
 const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,preserveDrawingBuffer:true,stencil:true});
 if(!gl)throw Error('WebGL2 unavailable');
@@ -10,7 +11,10 @@ if(!mr.ok||!sr.ok)throw Error('Expected art manifest and Rhubarb frame schedule'
 const manifest=await mr.json(),schedule=await sr.json();
 if(!Array.isArray(manifest.layers)||!manifest.layers.length||schedule.frame_count!==120||schedule.frames?.length!==120)throw Error('Invalid 5s art/schedule contract');
 const W=manifest.canvas.width,H=manifest.canvas.height;
-const scale=Math.min(460/W,450/H),ox=(480-W*scale)/2,oy=(480-H*scale)/2;
+const geometry=renderGeometry(W,H,new URLSearchParams(location.search).get('mode')||'legacy');
+const {scale,x:ox,y:oy}=geometry;
+canvas.width=geometry.width;canvas.height=geometry.height;
+privacyClass(manifest.status); // Unknown art can never be classified as public calibration.
 const transform=(x=0,y=0,pivot=[0,0])=>({x,y,rotation:0,scaleX:1,scaleY:1,pivotX:pivot[0],pivotY:pivot[1]});
 const quad=(w,h)=>({vertices:[{x:0,y:0},{x:w,y:0},{x:w,y:h},{x:0,y:h}],uvs:new Float32Array([0,0,1,0,1,1,0,1]),triangles:[[0,1,2],[0,2,3]],edgeIndices:[0,1,2,3]});
 const scene=new ScenePass(gl);
@@ -30,7 +34,7 @@ const animation={id:'nopants7e',name:'five_second_speech',duration:5000,fps:24,t
 ]};
 const project={version:'7e',canvas:{width:W,height:H},nodes,animations:[animation]};
 const editor={view:{zoom:scale,panX:ox,panY:oy},overlays:{showImage:true,showWireframe:false,showVertices:false,showEdgeOutline:false,irisClipping:false},selection:[],meshEditMode:false};
-window.__s7eReady=true;window.__s7eManifestStatus=manifest.status;
+window.__s7eReady=true;window.__s7eManifestStatus=manifest.status;window.__s7eGeometry=geometry;
 window.__renderS7EFrame=(i)=>{
  if(!Number.isInteger(i)||i<0||i>=120)throw Error('Frame out of bounds');
  const state=schedule.frames[i];

@@ -12,22 +12,14 @@ import urllib.request
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "nopants7f"))
 from private_transport import verify_bundle, seal_evidence, MAX_COMPRESSED
 
+from https_download import fetch_https
+
 EVIDENCE_NAMES = ("native7e.mp4", "metrics.json", "inspect_0000.png",
                   "inspect_0018.png", "inspect_0039.png", "inspect_0062.png",
                   "inspect_0089.png", "inspect_0119.png")
 
 def receive_private_bundle(url, expected_digest, destination):
-    parsed = urllib.parse.urlparse(url)
-    if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
-        raise ValueError("Private art host must be a valid HTTPS URL without userinfo")
-    request=urllib.request.Request(url, headers={"User-Agent":"NoPants-Secure-Runner/7G"})
-    with urllib.request.urlopen(request, timeout=60) as response:
-        final=urllib.parse.urlparse(response.geturl())
-        if final.scheme != "https" or final.username or final.password:
-            raise ValueError("Private art redirect must remain HTTPS")
-        raw=response.read(MAX_COMPRESSED+1)
-    if len(raw)>MAX_COMPRESSED:
-        raise ValueError("Private art ZIP exceeds size cap")
+    raw=fetch_https(url, MAX_COMPRESSED, "NoPants-Secure-Runner/7G")
     return verify_bundle(raw, expected_digest, destination)
 
 def seal_native_output(output_dir, key_hex, ciphertext_path):

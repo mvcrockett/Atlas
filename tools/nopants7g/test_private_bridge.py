@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 """No secrets or real art: bounded HTTPS ingress and encrypted egress contract tests."""
 import hashlib, io, json, os, pathlib, sys, tempfile, zipfile
 from PIL import Image
@@ -30,8 +31,8 @@ class FakeResponse:
 
 raw=fake_bundle()
 expected=hashlib.sha256(raw).hexdigest()
-old=bridge.urllib.request.urlopen
-bridge.urllib.request.urlopen=lambda req,timeout=60:FakeResponse(raw,"https://approved.example.org/one-time")
+old=bridge.urllib.request.build_opener
+bridge.urllib.request.build_opener=lambda *handlers:SimpleNamespace(open=lambda req,timeout=60:FakeResponse(raw,"https://approved.example.org/one-time"))
 try:
     with tempfile.TemporaryDirectory() as tmp:
         target=pathlib.Path(tmp)
@@ -57,4 +58,4 @@ try:
         else:raise AssertionError("Incomplete output accepted")
     print("PASS: 7G HTTPS-only, digest validation, 120-frame contract, sealed evidence, missing-output rejection; synthetic files only")
 finally:
-    bridge.urllib.request.urlopen=old
+    bridge.urllib.request.build_opener=old

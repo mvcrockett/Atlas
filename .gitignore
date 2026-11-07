@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+node_modules
+# Runtime artwork and outputs must never enter public history.
+art/
+output/

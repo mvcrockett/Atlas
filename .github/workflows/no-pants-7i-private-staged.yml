@@ -3,7 +3,7 @@
 # owner-managed SHA-256 original ZIP digest and AES-GCM output evidence key.
 # STAGED ONLY. PRIVATE CONTENT. DO NOT MERGE TO MAIN UNTIL OWNER HAS
 # APPROVED A HOST, CREATED PROTECTED ENVIRONMENT nopants-private, REVIEWED
-# RUNNER SECURITY, AND CONFIGURED ITS 3 ENCRYPTED SECRETS.
+# RUNNER SECURITY, AND CONFIGURED ITS 4 ENCRYPTED SECRETS.
 name: NoPants 7I PRIVATE Encrypted Heroine (Staged — Protected Environment)
 on:
   workflow_dispatch:
@@ -45,8 +45,9 @@ jobs:
           pnpm install --no-frozen-lockfile
           cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.html" ./bridge7e.html
           cp "$GITHUB_WORKSPACE/benchmarks/native7e/bridge7e.js" ./bridge7e.js
+          cp "$GITHUB_WORKSPACE/benchmarks/native7e/render_contract.mjs" ./render_contract.mjs
           mkdir -p art
-          cp -a "$RUNNER_TEMP/nopants7g-private-art/." ./art/
+          cp -a "$RUNNER_TEMP/nopants7i-private-art/." ./art/
       - name: Install browser for supported Ubuntu
         run: |
           cd benchmarks/native7e
@@ -64,6 +65,9 @@ jobs:
           echo "Native renderer did not become ready; private logs not uploaded"
           exit 1
       - name: Render 120 frames, 5-second private native scene
+        env:
+          NOPANTS_AUDIO_PATH: ${{ runner.temp }}/stretchystudio/art/dialogue.wav
+          NOPANTS_RENDER_MODE: native
         run: |
           umask 077
           node benchmarks/native7e/capture7e.mjs > "$RUNNER_TEMP/nopants7i-capture-private.log" 2>&1 || {
