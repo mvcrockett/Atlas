@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'">
+<title>No Pants Studio — Private Encryption Portal (PREDEPLOY)</title>
+<link rel="stylesheet" href="./portal.css">
+<script defer src="./portal.js"></script>
+</head>
+<body>
+<main>
+<div class="rainbow" aria-hidden="true"></div>
+<header><div class="eyebrow">👑 NO PANTS STUDIO · PRIVATE ENCRYPTION</div>
+<h1>Encrypt the heroine artwork <span>right on your iPhone.</span></h1>
+<p class="intro">Your original ZIP stays on your device. This page uses built-in browser cryptography, then saves an encrypted file to Files. <strong>Nothing is uploaded.</strong></p></header>
+<section class="step" aria-labelledby="step1"><h2 id="step1">💜 1. Choose the original ZIP</h2>
+<p>Use the private 12-file Sprint 7F heroine ZIP. We'll verify its exact SHA-256 before processing.</p>
+<label for="source">Choose your local heroine ZIP</label>
+<input id="source" type="file" accept=".zip,application/zip">
+<div id="file-info" class="hint">No file selected.</div>
+</section>
+<section class="step" aria-labelledby="step2"><h2 id="step2">💙 2. Protect the recovery password</h2>
+<div class="notice">Before entering it, create and save a <strong>unique 24+ character password</strong> in Apple Passwords. You must retain it independently. Never paste it into chat or public files.</div>
+<label for="password">Recovery password</label><input id="password" type="password" autocomplete="new-password" spellcheck="false" autocapitalize="off">
+<label for="confirm">Re-enter recovery password</label><input id="confirm" type="password" autocomplete="new-password" spellcheck="false" autocapitalize="off">
+</section>
+<section class="step" aria-labelledby="step3"><h2 id="step3">💚 3. Encrypt and save</h2>
+<p>Encryption: <strong>AES-256-GCM</strong> with random salt and nonce, password-derived by PBKDF2-HMAC-SHA-256 (600,000 iterations). Format matches our protected GitHub runner.</p>
+<button id="encrypt" type="button" disabled>🔐 Encrypt and save to Files</button>
+<div id="status" role="status" aria-live="polite" class="status">Browser security checks have not finished.</div>
+</section>
+<section class="step narrow"><h2>🧡 Privacy, security & limitations</h2>
+<ul><li>The page never sends selected files or passwords to a server.</li><li>GitHub Pages would host only these public source files; it is not deployed yet.</li><li>Use an HTTPS browser context. Some local HTML previews do not support Web Crypto.</li><li>Don't lose the password: the encrypted file cannot be recovered without it.</li><li>Do not upload plaintext artwork to GitHub, Dropbox or an unfamiliar encryption site.</li></ul>
+</section>
+<footer>🐦 <strong>Little pigeon summary:</strong> Choose the ZIP. Keep the password. Save the encrypted <code>.bin</code>—and nothing leaves your phone.</footer>
+</main>
+</body>
+</html>
