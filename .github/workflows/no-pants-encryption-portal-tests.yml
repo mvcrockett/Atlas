@@ -45,7 +45,7 @@ jobs:
             sleep 1
           done
           exit 1
-      - name: Real Chromium browser test: narrow mobile viewport, no uploads, ciphertext authenticated
+      - name: 'Real Chromium browser test: mobile viewport, no uploads, authenticated ciphertext'
         run: |
           cd docs/nopants/encryption-portal
           node test-portal.cjs
