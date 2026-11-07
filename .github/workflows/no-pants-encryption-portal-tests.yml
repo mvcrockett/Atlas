@@ -49,3 +49,12 @@ jobs:
         run: |
           cd docs/nopants/encryption-portal
           node test-portal.cjs
+
+      - name: Upload safe browser screenshot (no artwork)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nopants-encryption-portal-preview
+          path: docs/nopants/encryption-portal/portal-preview.png
+          if-no-files-found: error
+          retention-days: 7
